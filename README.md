@@ -103,9 +103,9 @@ func main() {
 
 ## 文档
 
-- [macOS 实现原理](doc/macos-implementation.md)
-- [Windows 实现原理](doc/windows-implementation.md)
-- [架构设计](doc/architecture.md)
+- [macOS 实现原理](docs/macos-implementation.md)
+- [Windows 实现原理](docs/windows-implementation.md)
+- [架构设计](docs/architecture.md)
 
 ## 许可证
 
