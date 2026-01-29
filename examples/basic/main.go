@@ -1,11 +1,11 @@
-// Package main demonstrates the basic usage of owl-go library.
+// Package main 演示 owl-go 库的基本用法。
 //
-// This example shows how to:
-// - Enumerate all monitors and their properties
-// - Enumerate all windows and their properties
-// - Capture screenshots of monitors and windows
+// 本示例展示如何：
+// - 枚举所有显示器及其属性
+// - 枚举所有窗口及其属性
+// - 截取显示器和窗口的屏幕截图
 //
-// Run with: go run ./examples/basic
+// 运行方式: go run ./examples/basic
 package main
 
 import (
@@ -24,24 +24,25 @@ func main() {
 	fmt.Println("=== owl-go Basic Example ===")
 	fmt.Println()
 
-	// Create output directory
+	// 创建输出目录
 	outputDir := "owl_output"
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		log.Fatalf("Failed to create output directory: %v", err)
 	}
 
-	// Demo 1: Monitor enumeration and capture
+	// 演示 1: 显示器枚举和截图
 	demoMonitors(outputDir)
 
 	fmt.Println()
 
-	// Demo 2: Window enumeration and capture
+	// 演示 2: 窗口枚举和截图
 	demoWindows(outputDir)
 
 	fmt.Println()
 	fmt.Printf("All screenshots saved to: %s/\n", outputDir)
 }
 
+// demoMonitors 演示显示器枚举和截图功能
 func demoMonitors(outputDir string) {
 	fmt.Println("--- Monitors ---")
 
@@ -54,7 +55,7 @@ func demoMonitors(outputDir string) {
 	fmt.Printf("Found %d monitor(s)\n\n", len(monitors))
 
 	for i, m := range monitors {
-		// Display monitor properties
+		// 显示 Monitor 的各项属性
 		fmt.Printf("Monitor #%d:\n", i)
 		fmt.Printf("  ID:          %d\n", m.ID())
 		fmt.Printf("  Name:        %s\n", m.Name())
@@ -66,14 +67,14 @@ func demoMonitors(outputDir string) {
 		fmt.Printf("  Primary:     %v\n", m.IsPrimary())
 		fmt.Printf("  Built-in:    %v\n", m.IsBuiltin())
 
-		// Capture screenshot
+		// 截取屏幕
 		img, err := m.CaptureImage()
 		if err != nil {
 			fmt.Printf("  Capture:     FAILED (%v)\n", err)
 			continue
 		}
 
-		// Save to file
+		// 保存到文件
 		filename := filepath.Join(outputDir, fmt.Sprintf("monitor_%d_%s.png", i, sanitize(m.Name())))
 		if err := savePNG(filename, img); err != nil {
 			fmt.Printf("  Capture:     FAILED to save (%v)\n", err)
@@ -85,6 +86,7 @@ func demoMonitors(outputDir string) {
 	}
 }
 
+// demoWindows 演示窗口枚举和截图功能
 func demoWindows(outputDir string) {
 	fmt.Println("--- Windows ---")
 
@@ -96,17 +98,17 @@ func demoWindows(outputDir string) {
 
 	fmt.Printf("Found %d window(s)\n\n", len(windows))
 
-	// Only capture first 5 windows with reasonable size
+	// 只截取前 5 个尺寸合适的窗口
 	captured := 0
 	maxCaptures := 5
 
 	for i, w := range windows {
-		// Skip tiny windows (likely system UI)
+		// 跳过太小的窗口（通常是系统 UI）
 		if w.Width() < 200 || w.Height() < 200 {
 			continue
 		}
 
-		// Display window properties
+		// 显示 Window 的各项属性
 		fmt.Printf("Window #%d:\n", i)
 		fmt.Printf("  ID:          %d\n", w.ID())
 		fmt.Printf("  PID:         %d\n", w.PID())
@@ -119,7 +121,7 @@ func demoWindows(outputDir string) {
 		fmt.Printf("  Maximized:   %v\n", w.IsMaximized())
 		fmt.Printf("  Focused:     %v\n", w.IsFocused())
 
-		// Capture screenshot
+		// 截取窗口
 		img, err := w.CaptureImage()
 		if err != nil {
 			fmt.Printf("  Capture:     FAILED (%v)\n", err)
@@ -127,7 +129,7 @@ func demoWindows(outputDir string) {
 			continue
 		}
 
-		// Save to file
+		// 保存到文件
 		title := w.Title()
 		if title == "" {
 			title = "untitled"
@@ -152,7 +154,7 @@ func demoWindows(outputDir string) {
 	}
 }
 
-// savePNG saves an image to a PNG file
+// savePNG 将图像保存为 PNG 文件
 func savePNG(filename string, img image.Image) error {
 	f, err := os.Create(filename)
 	if err != nil {
@@ -162,7 +164,7 @@ func savePNG(filename string, img image.Image) error {
 	return png.Encode(f, img)
 }
 
-// sanitize removes invalid filename characters
+// sanitize 移除文件名中的非法字符
 func sanitize(name string) string {
 	replacer := strings.NewReplacer(
 		"/", "_", "\\", "_", ":", "_", "|", "_",
@@ -176,7 +178,7 @@ func sanitize(name string) string {
 	return result
 }
 
-// truncate shortens a string with ellipsis
+// truncate 截断字符串并添加省略号
 func truncate(s string, maxLen int) string {
 	if len(s) <= maxLen {
 		return s

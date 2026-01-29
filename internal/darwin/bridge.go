@@ -15,7 +15,7 @@ import (
 	"unsafe"
 )
 
-// Error codes matching bridge.h
+// 错误码，与 bridge.h 中的定义对应
 const (
 	errOK            = C.OWL_OK
 	errNoMonitors    = C.OWL_ERR_NO_MONITORS
@@ -25,7 +25,7 @@ const (
 	errNotFound      = C.OWL_ERR_NOT_FOUND
 )
 
-// MonitorInfo represents monitor information from C layer
+// MonitorInfo 表示从 C 层获取的显示器信息
 type MonitorInfo struct {
 	ID     uint32
 	Name   string
@@ -35,7 +35,7 @@ type MonitorInfo struct {
 	Height uint32
 }
 
-// WindowInfo represents window information from C layer
+// WindowInfo 表示从 C 层获取的窗口信息
 type WindowInfo struct {
 	ID      uint32
 	PID     uint32
@@ -47,7 +47,7 @@ type WindowInfo struct {
 	Height  uint32
 }
 
-// CaptureResult represents raw capture data from C layer
+// CaptureResult 表示从 C 层获取的原始截图数据
 type CaptureResult struct {
 	Data        []byte
 	Width       uint32
@@ -55,7 +55,7 @@ type CaptureResult struct {
 	BytesPerRow uint32
 }
 
-// GetAllMonitors returns information about all active monitors
+// GetAllMonitors 返回所有活动显示器的信息
 func GetAllMonitors() ([]MonitorInfo, error) {
 	var cMonitors *C.OwlMonitorInfo
 	var cCount C.int
@@ -70,11 +70,11 @@ func GetAllMonitors() ([]MonitorInfo, error) {
 		return nil, nil
 	}
 
-	// Convert C array to Go slice
+	// 将 C 数组转换为 Go slice
 	count := int(cCount)
 	monitors := make([]MonitorInfo, count)
 
-	// Create a Go slice backed by the C array
+	// 创建由 C 数组支持的 Go slice
 	cSlice := unsafe.Slice(cMonitors, count)
 
 	for i := 0; i < count; i++ {
@@ -91,7 +91,7 @@ func GetAllMonitors() ([]MonitorInfo, error) {
 	return monitors, nil
 }
 
-// GetAllWindows returns information about all visible windows
+// GetAllWindows 返回所有可见窗口的信息
 func GetAllWindows() ([]WindowInfo, error) {
 	var cWindows *C.OwlWindowInfo
 	var cCount C.int
@@ -106,11 +106,11 @@ func GetAllWindows() ([]WindowInfo, error) {
 		return nil, nil
 	}
 
-	// Convert C array to Go slice
+	// 将 C 数组转换为 Go slice
 	count := int(cCount)
 	windows := make([]WindowInfo, count)
 
-	// Create a Go slice backed by the C array
+	// 创建由 C 数组支持的 Go slice
 	cSlice := unsafe.Slice(cWindows, count)
 
 	for i := 0; i < count; i++ {
@@ -129,7 +129,7 @@ func GetAllWindows() ([]WindowInfo, error) {
 	return windows, nil
 }
 
-// CaptureMonitor captures the specified monitor and returns raw BGRA data
+// CaptureMonitor 截取指定显示器，返回原始 BGRA 数据
 func CaptureMonitor(displayID uint32) (*CaptureResult, error) {
 	var cResult C.OwlCaptureResult
 
@@ -139,7 +139,7 @@ func CaptureMonitor(displayID uint32) (*CaptureResult, error) {
 	}
 	defer C.owl_free_capture_result(&cResult)
 
-	// Copy data to Go slice
+	// 将数据复制到 Go slice
 	dataLen := int(cResult.data_length)
 	data := make([]byte, dataLen)
 	copy(data, unsafe.Slice((*byte)(unsafe.Pointer(cResult.data)), dataLen))
@@ -152,7 +152,7 @@ func CaptureMonitor(displayID uint32) (*CaptureResult, error) {
 	}, nil
 }
 
-// CaptureWindow captures the specified window and returns raw BGRA data
+// CaptureWindow 截取指定窗口，返回原始 BGRA 数据
 func CaptureWindow(windowID uint32) (*CaptureResult, error) {
 	var cResult C.OwlCaptureResult
 
@@ -162,7 +162,7 @@ func CaptureWindow(windowID uint32) (*CaptureResult, error) {
 	}
 	defer C.owl_free_capture_result(&cResult)
 
-	// Copy data to Go slice
+	// 将数据复制到 Go slice
 	dataLen := int(cResult.data_length)
 	data := make([]byte, dataLen)
 	copy(data, unsafe.Slice((*byte)(unsafe.Pointer(cResult.data)), dataLen))

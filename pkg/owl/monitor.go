@@ -2,44 +2,44 @@ package owl
 
 import "image"
 
-// Monitor represents a display/monitor
+// Monitor 表示一个显示器/监视器
 type Monitor interface {
-	// ID returns the unique identifier of the monitor
+	// ID 返回显示器的唯一标识符
 	ID() uint32
 
-	// Name returns the friendly name of the monitor
+	// Name 返回显示器的友好名称
 	Name() string
 
-	// X returns the x coordinate of the monitor's top-left corner
+	// X 返回显示器左上角的 x 坐标
 	X() int
 
-	// Y returns the y coordinate of the monitor's top-left corner
+	// Y 返回显示器左上角的 y 坐标
 	Y() int
 
-	// Width returns the width of the monitor in pixels
+	// Width 返回显示器的宽度（像素）
 	Width() uint32
 
-	// Height returns the height of the monitor in pixels
+	// Height 返回显示器的高度（像素）
 	Height() uint32
 
-	// Rotation returns the rotation angle in degrees (0, 90, 180, 270)
+	// Rotation 返回旋转角度（0, 90, 180, 270）
 	Rotation() float32
 
-	// ScaleFactor returns the DPI scale factor (e.g., 2.0 for Retina/HiDPI)
+	// ScaleFactor 返回 DPI 缩放因子（如 Retina 显示器为 2.0）
 	ScaleFactor() float32
 
-	// Frequency returns the refresh rate in Hz
+	// Frequency 返回刷新率（Hz）
 	Frequency() float32
 
-	// IsPrimary returns true if this is the primary monitor
+	// IsPrimary 返回是否为主显示器
 	IsPrimary() bool
 
-	// IsBuiltin returns true if this is a built-in display (laptop screen)
+	// IsBuiltin 返回是否为内置显示器（如笔记本屏幕）
 	IsBuiltin() bool
 
-	// CaptureImage captures the entire monitor and returns an RGBA image
+	// CaptureImage 截取整个显示器，返回 RGBA 图像
 	CaptureImage() (*image.RGBA, error)
 
-	// CaptureRegion captures a specific region of the monitor
+	// CaptureRegion 截取显示器的指定区域
 	CaptureRegion(x, y, width, height uint32) (*image.RGBA, error)
 }

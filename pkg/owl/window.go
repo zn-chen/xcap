@@ -2,47 +2,47 @@ package owl
 
 import "image"
 
-// Window represents an application window
+// Window 表示一个应用程序窗口
 type Window interface {
-	// ID returns the unique identifier of the window (HWND on Windows, CGWindowID on macOS)
+	// ID 返回窗口的唯一标识符（Windows 上为 HWND，macOS 上为 CGWindowID）
 	ID() uint32
 
-	// PID returns the process ID of the window's owner
+	// PID 返回窗口所属进程的 ID
 	PID() uint32
 
-	// AppName returns the name of the application that owns the window
+	// AppName 返回拥有该窗口的应用程序名称
 	AppName() string
 
-	// Title returns the window title
+	// Title 返回窗口标题
 	Title() string
 
-	// X returns the x coordinate of the window's top-left corner
+	// X 返回窗口左上角的 x 坐标
 	X() int
 
-	// Y returns the y coordinate of the window's top-left corner
+	// Y 返回窗口左上角的 y 坐标
 	Y() int
 
-	// Z returns the z-order of the window (higher values are on top)
+	// Z 返回窗口的 Z 顺序（值越大越靠前）
 	Z() int
 
-	// Width returns the width of the window in pixels
+	// Width 返回窗口的宽度（像素）
 	Width() uint32
 
-	// Height returns the height of the window in pixels
+	// Height 返回窗口的高度（像素）
 	Height() uint32
 
-	// IsMinimized returns true if the window is minimized
+	// IsMinimized 返回窗口是否最小化
 	IsMinimized() bool
 
-	// IsMaximized returns true if the window is maximized
+	// IsMaximized 返回窗口是否最大化
 	IsMaximized() bool
 
-	// IsFocused returns true if the window has input focus
+	// IsFocused 返回窗口是否拥有输入焦点
 	IsFocused() bool
 
-	// CurrentMonitor returns the monitor that contains most of the window
+	// CurrentMonitor 返回窗口所在的显示器
 	CurrentMonitor() (Monitor, error)
 
-	// CaptureImage captures the window content and returns an RGBA image
+	// CaptureImage 截取窗口内容，返回 RGBA 图像
 	CaptureImage() (*image.RGBA, error)
 }

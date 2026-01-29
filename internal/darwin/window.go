@@ -6,17 +6,17 @@ import (
 	"image"
 )
 
-// Window represents an application window on macOS
+// Window 表示 macOS 上的应用程序窗口
 type Window struct {
 	info WindowInfo
 }
 
-// NewWindow creates a new Window from WindowInfo
+// NewWindow 从 WindowInfo 创建新的 Window
 func NewWindow(info WindowInfo) *Window {
 	return &Window{info: info}
 }
 
-// AllWindows returns all visible windows
+// AllWindows 返回所有可见的窗口
 func AllWindows() ([]*Window, error) {
 	infos, err := GetAllWindows()
 	if err != nil {
@@ -31,72 +31,72 @@ func AllWindows() ([]*Window, error) {
 	return windows, nil
 }
 
-// ID returns the unique identifier of the window
+// ID 返回窗口的唯一标识符
 func (w *Window) ID() uint32 {
 	return w.info.ID
 }
 
-// PID returns the process ID of the window's owner
+// PID 返回窗口所属进程的 ID
 func (w *Window) PID() uint32 {
 	return w.info.PID
 }
 
-// AppName returns the name of the application that owns the window
+// AppName 返回拥有该窗口的应用程序名称
 func (w *Window) AppName() string {
 	return w.info.AppName
 }
 
-// Title returns the window title
+// Title 返回窗口标题
 func (w *Window) Title() string {
 	return w.info.Title
 }
 
-// X returns the x coordinate of the window's top-left corner
+// X 返回窗口左上角的 x 坐标
 func (w *Window) X() int {
 	return int(w.info.X)
 }
 
-// Y returns the y coordinate of the window's top-left corner
+// Y 返回窗口左上角的 y 坐标
 func (w *Window) Y() int {
 	return int(w.info.Y)
 }
 
-// Z returns the z-order of the window (not implemented in minimal version)
+// Z 返回窗口的 Z 顺序（最小版本暂未实现）
 func (w *Window) Z() int {
-	return 0 // TODO: implement in full version
+	return 0 // TODO: 在完整版本中实现
 }
 
-// Width returns the width of the window in pixels
+// Width 返回窗口的宽度（像素）
 func (w *Window) Width() uint32 {
 	return w.info.Width
 }
 
-// Height returns the height of the window in pixels
+// Height 返回窗口的高度（像素）
 func (w *Window) Height() uint32 {
 	return w.info.Height
 }
 
-// IsMinimized returns true if the window is minimized (not implemented in minimal version)
+// IsMinimized 返回窗口是否最小化（最小版本暂未实现）
 func (w *Window) IsMinimized() bool {
-	return false // TODO: implement in full version
+	return false // TODO: 在完整版本中实现
 }
 
-// IsMaximized returns true if the window is maximized (not implemented in minimal version)
+// IsMaximized 返回窗口是否最大化（最小版本暂未实现）
 func (w *Window) IsMaximized() bool {
-	return false // TODO: implement in full version
+	return false // TODO: 在完整版本中实现
 }
 
-// IsFocused returns true if the window has input focus (not implemented in minimal version)
+// IsFocused 返回窗口是否拥有输入焦点（最小版本暂未实现）
 func (w *Window) IsFocused() bool {
-	return false // TODO: implement in full version
+	return false // TODO: 在完整版本中实现
 }
 
-// CurrentMonitor returns the monitor that contains most of the window (not implemented in minimal version)
+// CurrentMonitor 返回窗口所在的显示器（最小版本暂未实现）
 func (w *Window) CurrentMonitor() (*Monitor, error) {
-	return nil, ErrNotSupported // TODO: implement in full version
+	return nil, ErrNotSupported // TODO: 在完整版本中实现
 }
 
-// CaptureImage captures the window content and returns an RGBA image
+// CaptureImage 截取窗口内容，返回 RGBA 图像
 func (w *Window) CaptureImage() (*image.RGBA, error) {
 	result, err := CaptureWindow(w.info.ID)
 	if err != nil {

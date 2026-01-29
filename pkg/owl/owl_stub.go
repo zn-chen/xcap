@@ -2,12 +2,12 @@
 
 package owl
 
-// AllMonitors returns all available monitors on the system
+// AllMonitors 返回系统上所有可用的显示器
 func AllMonitors() ([]Monitor, error) {
 	return nil, ErrNotSupported
 }
 
-// AllWindows returns all visible windows on the system
+// AllWindows 返回系统上所有可见的窗口
 func AllWindows() ([]Window, error) {
 	return nil, ErrNotSupported
 }

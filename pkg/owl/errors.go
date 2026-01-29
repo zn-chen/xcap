@@ -2,27 +2,27 @@ package owl
 
 import "errors"
 
-// Common errors
+// 通用错误定义
 var (
-	// ErrNoMonitor is returned when no monitor is found
+	// ErrNoMonitor 在找不到显示器时返回
 	ErrNoMonitor = errors.New("owl: no monitor found")
 
-	// ErrNoWindow is returned when no window is found
+	// ErrNoWindow 在找不到窗口时返回
 	ErrNoWindow = errors.New("owl: no window found")
 
-	// ErrCaptureFailed is returned when screen/window capture fails
+	// ErrCaptureFailed 在屏幕/窗口截图失败时返回
 	ErrCaptureFailed = errors.New("owl: capture failed")
 
-	// ErrPermissionDenied is returned when the app lacks necessary permissions
-	// On macOS, this typically means Screen Recording permission is not granted
+	// ErrPermissionDenied 在应用缺少必要权限时返回
+	// 在 macOS 上，通常表示未授予 Screen Recording 权限
 	ErrPermissionDenied = errors.New("owl: permission denied")
 
-	// ErrWindowMinimized is returned when trying to capture a minimized window
+	// ErrWindowMinimized 在尝试截取最小化窗口时返回
 	ErrWindowMinimized = errors.New("owl: window is minimized")
 
-	// ErrInvalidRegion is returned when the capture region is invalid
+	// ErrInvalidRegion 在截图区域无效时返回
 	ErrInvalidRegion = errors.New("owl: invalid capture region")
 
-	// ErrNotSupported is returned when a feature is not supported on the current platform
+	// ErrNotSupported 在当前平台不支持该功能时返回
 	ErrNotSupported = errors.New("owl: not supported on this platform")
 )
