@@ -166,19 +166,14 @@ func getProcessName(pid uint32) string {
 var callbackSystemInitialized = false
 
 // initCallback 是初始化用的回调函数
-// 在回调中调用 GetMonitorInfoW 来触发必要的初始化
+// 在回调中调用一个 Windows API 来触发必要的初始化
 func initCallback(hMonitor HMONITOR, hdcMonitor HDC, lprcMonitor *RECT, dwData uintptr) uintptr {
-	var mi MONITORINFOEXW
-	mi.CbSize = uint32(unsafe.Sizeof(mi))
-	GetMonitorInfoW(hMonitor, &mi)
+	// 测试：只调用 GetDesktopWindow 而不是 GetMonitorInfoW
+	GetDesktopWindow()
 	return 0 // 只需要第一个就够了，返回 0 停止枚举
 }
 
 // ensureCallbackSystemInitialized 确保 Windows 回调系统已初始化
-//
-// 背景: Go 的 syscall.NewCallback 在 Windows 上存在一个特殊行为：
-// 直接调用 EnumWindows 的回调可能无法正常工作。
-// 必须先在一个回调函数内调用 GetMonitorInfoW 来触发某种初始化。
 func ensureCallbackSystemInitialized() {
 	if callbackSystemInitialized {
 		return
