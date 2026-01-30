@@ -2,6 +2,7 @@
 #define XCAP_BRIDGE_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 // Error codes
 #define XCAP_OK 0
@@ -19,6 +20,8 @@ typedef struct {
     int32_t y;
     uint32_t width;
     uint32_t height;
+    bool is_primary;
+    float scale_factor;
 } XcapMonitorInfo;
 
 // Window information
@@ -49,8 +52,13 @@ int xcap_capture_monitor(uint32_t display_id, XcapCaptureResult *result);
 
 // Window functions
 int xcap_get_all_windows(XcapWindowInfo **windows, int *count);
+int xcap_get_all_windows_ex(XcapWindowInfo **windows, int *count, bool exclude_current_process);
 void xcap_free_windows(XcapWindowInfo *windows);
 int xcap_capture_window(uint32_t window_id, XcapCaptureResult *result);
+
+// Window state functions
+uint32_t xcap_get_frontmost_window_id(void);
+uint32_t xcap_get_current_pid(void);
 
 // Capture cleanup
 void xcap_free_capture_result(XcapCaptureResult *result);

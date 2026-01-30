@@ -70,19 +70,19 @@ func (m *Monitor) Rotation() float32 {
 	return 0 // TODO: 在完整版本中实现
 }
 
-// ScaleFactor 返回 DPI 缩放因子（最小版本暂未实现）
+// ScaleFactor 返回 DPI 缩放因子
 func (m *Monitor) ScaleFactor() float32 {
-	return 1.0 // TODO: 在完整版本中实现
+	return m.info.ScaleFactor
 }
 
-// Frequency 返回刷新率（最小版本暂未实现）
+// Frequency 返回刷新率（暂未实现）
 func (m *Monitor) Frequency() float32 {
 	return 0 // TODO: 在完整版本中实现
 }
 
-// IsPrimary 返回是否为主显示器（最小版本暂未实现）
+// IsPrimary 返回是否为主显示器
 func (m *Monitor) IsPrimary() bool {
-	return false // TODO: 在完整版本中实现
+	return m.info.IsPrimary
 }
 
 // IsBuiltin 返回是否为内置显示器（最小版本暂未实现）

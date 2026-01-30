@@ -18,7 +18,13 @@ func NewWindow(info WindowInfo) *Window {
 
 // AllWindows 返回所有可见的窗口
 func AllWindows() ([]*Window, error) {
-	infos, err := GetAllWindows()
+	return AllWindowsWithOptions(false)
+}
+
+// AllWindowsWithOptions 返回所有可见的窗口
+// excludeCurrentProcess: 是否排除当前进程的窗口
+func AllWindowsWithOptions(excludeCurrentProcess bool) ([]*Window, error) {
+	infos, err := GetAllWindowsWithOptions(excludeCurrentProcess)
 	if err != nil {
 		return nil, err
 	}
@@ -86,9 +92,10 @@ func (w *Window) IsMaximized() bool {
 	return false // TODO: 在完整版本中实现
 }
 
-// IsFocused 返回窗口是否拥有输入焦点（最小版本暂未实现）
+// IsFocused 返回窗口是否拥有输入焦点
 func (w *Window) IsFocused() bool {
-	return false // TODO: 在完整版本中实现
+	frontID := GetFrontmostWindowID()
+	return w.info.ID == frontID
 }
 
 // CurrentMonitor 返回窗口所在的显示器（最小版本暂未实现）

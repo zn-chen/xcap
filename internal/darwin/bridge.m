@@ -56,17 +56,21 @@ int xcap_get_all_monitors(XcapMonitorInfo **monitors, int *count) {
             result[i].y = (int32_t)bounds.origin.y;
             result[i].width = (uint32_t)bounds.size.width;
             result[i].height = (uint32_t)bounds.size.height;
+            result[i].is_primary = CGDisplayIsMain(display_id);
 
-            // Find matching NSScreen for friendly name
+            // Find matching NSScreen for friendly name and scale factor
             NSString *name = nil;
+            CGFloat scale = 1.0;
             for (NSScreen *screen in screens) {
                 NSDictionary *desc = [screen deviceDescription];
                 NSNumber *screenNumber = desc[@"NSScreenNumber"];
                 if (screenNumber && [screenNumber unsignedIntValue] == display_id) {
                     name = [screen localizedName];
+                    scale = [screen backingScaleFactor];
                     break;
                 }
             }
+            result[i].scale_factor = (float)scale;
 
             if (name) {
                 copy_nsstring_to_buffer(name, result[i].name, sizeof(result[i].name));
@@ -144,7 +148,8 @@ int xcap_capture_monitor(uint32_t display_id, XcapCaptureResult *result) {
 
 #pragma mark - Window Functions
 
-int xcap_get_all_windows(XcapWindowInfo **windows, int *count) {
+// Internal implementation with exclude option
+static int xcap_get_all_windows_internal(XcapWindowInfo **windows, int *count, bool exclude_current_process, pid_t current_pid) {
     @autoreleasepool {
         // Get window list
         CFArrayRef window_list = CGWindowListCopyWindowInfo(
@@ -179,6 +184,18 @@ int xcap_get_all_windows(XcapWindowInfo **windows, int *count) {
             }
             if (sharing_state == 0) {
                 continue;
+            }
+
+            // Get PID for filtering
+            if (exclude_current_process) {
+                CFNumberRef pid_ref = CFDictionaryGetValue(window_info, kCGWindowOwnerPID);
+                int pid = 0;
+                if (pid_ref) {
+                    CFNumberGetValue(pid_ref, kCFNumberIntType, &pid);
+                }
+                if (pid == current_pid) {
+                    continue;
+                }
             }
 
             // Filter StatusIndicator
@@ -226,6 +243,18 @@ int xcap_get_all_windows(XcapWindowInfo **windows, int *count) {
                 continue;
             }
 
+            // Get PID
+            CFNumberRef pid_ref = CFDictionaryGetValue(window_info, kCGWindowOwnerPID);
+            uint32_t pid = 0;
+            if (pid_ref) {
+                CFNumberGetValue(pid_ref, kCFNumberIntType, &pid);
+            }
+
+            // Filter current process
+            if (exclude_current_process && (int)pid == current_pid) {
+                continue;
+            }
+
             // Filter StatusIndicator
             CFStringRef name_ref = CFDictionaryGetValue(window_info, kCGWindowName);
             CFStringRef owner_ref = CFDictionaryGetValue(window_info, kCGWindowOwnerName);
@@ -242,13 +271,6 @@ int xcap_get_all_windows(XcapWindowInfo **windows, int *count) {
             uint32_t window_id = 0;
             if (window_id_ref) {
                 CFNumberGetValue(window_id_ref, kCFNumberIntType, &window_id);
-            }
-
-            // Get PID
-            CFNumberRef pid_ref = CFDictionaryGetValue(window_info, kCGWindowOwnerPID);
-            uint32_t pid = 0;
-            if (pid_ref) {
-                CFNumberGetValue(pid_ref, kCFNumberIntType, &pid);
             }
 
             // Get bounds
@@ -286,6 +308,15 @@ int xcap_get_all_windows(XcapWindowInfo **windows, int *count) {
         *count = result_index;
         return XCAP_OK;
     }
+}
+
+int xcap_get_all_windows(XcapWindowInfo **windows, int *count) {
+    return xcap_get_all_windows_internal(windows, count, false, 0);
+}
+
+int xcap_get_all_windows_ex(XcapWindowInfo **windows, int *count, bool exclude_current_process) {
+    pid_t current_pid = exclude_current_process ? getpid() : 0;
+    return xcap_get_all_windows_internal(windows, count, exclude_current_process, current_pid);
 }
 
 void xcap_free_windows(XcapWindowInfo *windows) {
@@ -373,4 +404,35 @@ void xcap_free_capture_result(XcapCaptureResult *result) {
         free(result->data);
         result->data = NULL;
     }
+}
+
+#pragma mark - Utility Functions
+
+uint32_t xcap_get_frontmost_window_id(void) {
+    @autoreleasepool {
+        CFArrayRef window_list = CGWindowListCopyWindowInfo(
+            kCGWindowListOptionOnScreenOnly | kCGWindowListExcludeDesktopElements,
+            kCGNullWindowID
+        );
+
+        if (window_list == NULL || CFArrayGetCount(window_list) == 0) {
+            if (window_list) CFRelease(window_list);
+            return 0;
+        }
+
+        // The first window in the list is typically the frontmost
+        CFDictionaryRef window_info = CFArrayGetValueAtIndex(window_list, 0);
+        CFNumberRef window_id_ref = CFDictionaryGetValue(window_info, kCGWindowNumber);
+        uint32_t window_id = 0;
+        if (window_id_ref) {
+            CFNumberGetValue(window_id_ref, kCFNumberIntType, &window_id);
+        }
+
+        CFRelease(window_list);
+        return window_id;
+    }
+}
+
+uint32_t xcap_get_current_pid(void) {
+    return (uint32_t)getpid();
 }

@@ -6,15 +6,39 @@
 
 ## 功能特性
 
-- 跨平台支持：macOS 和 Windows
-- 屏幕截图：支持多显示器
-- 窗口截图：支持捕获单个应用窗口
-- 区域截图：支持截取屏幕指定区域
+| 功能 | macOS | Windows |
+|------|-------|---------|
+| 显示器截图 | ✅ | ✅ |
+| 窗口截图 | ✅ | ✅ |
+| 多显示器支持 | ✅ | ✅ |
+| 显示器 IsPrimary | ✅ | ✅ |
+| 显示器 ScaleFactor | ✅ | ✅ |
+| 窗口 IsFocused | ✅ | ✅ |
+| 窗口 IsMinimized | ❌ | ✅ |
+| 窗口 IsMaximized | ❌ | ✅ |
+| 排除当前进程窗口 | ✅ | ✅ |
+| 区域截图 | ❌ | ❌ |
 
 ## 安装
 
 ```bash
 go get github.com/zn-chen/xcap
+```
+
+## CLI 工具
+
+```bash
+# 构建
+make build
+
+# 运行（截取所有显示器和窗口到 ./output/）
+./bin/xcap
+
+# 只截取显示器
+./bin/xcap --disable_windows
+
+# 只截取窗口
+./bin/xcap --disable_monitor
 ```
 
 ## 快速开始
@@ -74,12 +98,6 @@ func main() {
     }
 
     for i, w := range windows {
-        if w.IsMinimized() {
-            continue
-        }
-
-        log.Printf("Window: %s (%s)", w.Title(), w.AppName())
-
         img, err := w.CaptureImage()
         if err != nil {
             log.Printf("Failed to capture window: %v", err)
@@ -99,10 +117,12 @@ func main() {
 
 - macOS 10.15+
 - 需要 Screen Recording 权限（系统设置 > 隐私与安全 > 屏幕录制）
+- 需要 Xcode Command Line Tools（用于 CGO）
 
 ### Windows
 
 - Windows 8.1+
+- 需要 MinGW-w64（用于 CGO）
 - 无额外权限要求
 
 ## 文档

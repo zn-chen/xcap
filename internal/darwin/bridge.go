@@ -27,12 +27,14 @@ const (
 
 // MonitorInfo 表示从 C 层获取的显示器信息
 type MonitorInfo struct {
-	ID     uint32
-	Name   string
-	X      int32
-	Y      int32
-	Width  uint32
-	Height uint32
+	ID          uint32
+	Name        string
+	X           int32
+	Y           int32
+	Width       uint32
+	Height      uint32
+	IsPrimary   bool
+	ScaleFactor float32
 }
 
 // WindowInfo 表示从 C 层获取的窗口信息
@@ -79,12 +81,14 @@ func GetAllMonitors() ([]MonitorInfo, error) {
 
 	for i := 0; i < count; i++ {
 		monitors[i] = MonitorInfo{
-			ID:     uint32(cSlice[i].id),
-			Name:   C.GoString(&cSlice[i].name[0]),
-			X:      int32(cSlice[i].x),
-			Y:      int32(cSlice[i].y),
-			Width:  uint32(cSlice[i].width),
-			Height: uint32(cSlice[i].height),
+			ID:          uint32(cSlice[i].id),
+			Name:        C.GoString(&cSlice[i].name[0]),
+			X:           int32(cSlice[i].x),
+			Y:           int32(cSlice[i].y),
+			Width:       uint32(cSlice[i].width),
+			Height:      uint32(cSlice[i].height),
+			IsPrimary:   bool(cSlice[i].is_primary),
+			ScaleFactor: float32(cSlice[i].scale_factor),
 		}
 	}
 
@@ -93,10 +97,16 @@ func GetAllMonitors() ([]MonitorInfo, error) {
 
 // GetAllWindows 返回所有可见窗口的信息
 func GetAllWindows() ([]WindowInfo, error) {
+	return GetAllWindowsWithOptions(false)
+}
+
+// GetAllWindowsWithOptions 返回所有可见窗口的信息
+// excludeCurrentProcess: 是否排除当前进程的窗口
+func GetAllWindowsWithOptions(excludeCurrentProcess bool) ([]WindowInfo, error) {
 	var cWindows *C.XcapWindowInfo
 	var cCount C.int
 
-	result := C.xcap_get_all_windows(&cWindows, &cCount)
+	result := C.xcap_get_all_windows_ex(&cWindows, &cCount, C.bool(excludeCurrentProcess))
 	if result != errOK {
 		return nil, fmt.Errorf("failed to get windows: error code %d", result)
 	}
@@ -127,6 +137,16 @@ func GetAllWindows() ([]WindowInfo, error) {
 	}
 
 	return windows, nil
+}
+
+// GetFrontmostWindowID 返回最前面窗口的 ID
+func GetFrontmostWindowID() uint32 {
+	return uint32(C.xcap_get_frontmost_window_id())
+}
+
+// GetCurrentPID 返回当前进程的 PID
+func GetCurrentPID() uint32 {
+	return uint32(C.xcap_get_current_pid())
 }
 
 // CaptureMonitor 截取指定显示器，返回原始 BGRA 数据

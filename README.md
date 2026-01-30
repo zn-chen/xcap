@@ -6,15 +6,39 @@ A cross-platform screen and window capture library for Go, inspired by [xcap](ht
 
 ## Features
 
-- Cross-platform support: macOS and Windows
-- Screen capture: Multi-monitor support
-- Window capture: Capture individual application windows
-- Region capture: Capture specific screen regions
+| Feature | macOS | Windows |
+|---------|-------|---------|
+| Monitor capture | ✅ | ✅ |
+| Window capture | ✅ | ✅ |
+| Multi-monitor support | ✅ | ✅ |
+| Monitor IsPrimary | ✅ | ✅ |
+| Monitor ScaleFactor | ✅ | ✅ |
+| Window IsFocused | ✅ | ✅ |
+| Window IsMinimized | ❌ | ✅ |
+| Window IsMaximized | ❌ | ✅ |
+| Exclude current process | ✅ | ✅ |
+| Region capture | ❌ | ❌ |
 
 ## Installation
 
 ```bash
 go get github.com/zn-chen/xcap
+```
+
+## CLI Tool
+
+```bash
+# Build
+make build
+
+# Run (captures all monitors and windows to ./output/)
+./bin/xcap
+
+# Capture monitors only
+./bin/xcap --disable_windows
+
+# Capture windows only
+./bin/xcap --disable_monitor
 ```
 
 ## Quick Start
@@ -74,12 +98,6 @@ func main() {
     }
 
     for i, w := range windows {
-        if w.IsMinimized() {
-            continue
-        }
-
-        log.Printf("Window: %s (%s)", w.Title(), w.AppName())
-
         img, err := w.CaptureImage()
         if err != nil {
             log.Printf("Failed to capture window: %v", err)
@@ -99,10 +117,12 @@ func main() {
 
 - macOS 10.15+
 - Screen Recording permission required (System Settings > Privacy & Security > Screen Recording)
+- Requires Xcode Command Line Tools (for CGO)
 
 ### Windows
 
 - Windows 8.1+
+- Requires MinGW-w64 (for CGO)
 - No additional permissions required
 
 ## Documentation

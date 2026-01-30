@@ -6,7 +6,6 @@ import (
 	"image/png"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/zn-chen/xcap/pkg/xcap"
@@ -74,7 +73,7 @@ func captureMonitors(outputDir string) int {
 			continue
 		}
 
-		filename := fmt.Sprintf("monitor_%d_%s.png", i+1, sanitizeFilename(m.Name()))
+		filename := fmt.Sprintf("monitor_%d_%s.png", i+1, xcap.SanitizeFilename(m.Name()))
 		path := filepath.Join(outputDir, filename)
 
 		if err := saveImage(path, img); err != nil {
@@ -114,7 +113,7 @@ func captureWindows(outputDir string) int {
 			title = title[:30]
 		}
 
-		filename := fmt.Sprintf("window_%d_%s_%s.png", i+1, sanitizeFilename(w.AppName()), sanitizeFilename(title))
+		filename := fmt.Sprintf("window_%d_%s_%s.png", i+1, xcap.SanitizeFilename(w.AppName()), xcap.SanitizeFilename(title))
 		path := filepath.Join(outputDir, filename)
 
 		if err := saveImage(path, img); err != nil {
@@ -135,21 +134,4 @@ func saveImage(path string, img *image.RGBA) error {
 	}
 	defer f.Close()
 	return png.Encode(f, img)
-}
-
-func sanitizeFilename(name string) string {
-	replacer := strings.NewReplacer(
-		"/", "_", "\\", "_", ":", "_", "*", "_",
-		"?", "_", "\"", "_", "<", "_", ">", "_",
-		"|", "_", "\n", "_", "\r", "_",
-	)
-	result := replacer.Replace(name)
-	if len(result) > 50 {
-		result = result[:50]
-	}
-	result = strings.TrimSpace(result)
-	if result == "" {
-		result = "unnamed"
-	}
-	return result
 }
