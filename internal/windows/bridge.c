@@ -12,10 +12,16 @@
 #pragma comment(lib, "dwmapi.lib")
 #pragma comment(lib, "shcore.lib")
 
-// Constants
+// Constants (only define if not already defined by Windows headers)
+#ifndef DWMWA_CLOAKED
 #define DWMWA_CLOAKED 14
+#endif
+#ifndef DWMWA_EXTENDED_FRAME_BOUNDS
 #define DWMWA_EXTENDED_FRAME_BOUNDS 9
+#endif
+#ifndef PW_RENDERFULLCONTENT
 #define PW_RENDERFULLCONTENT 2
+#endif
 
 // ============================================================================
 // Monitor Functions
