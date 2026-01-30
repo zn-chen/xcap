@@ -162,12 +162,28 @@ func getProcessName(pid uint32) string {
 	return UTF16ToString(nameBuf)
 }
 
+// dummyEnumProc 是一个空的枚举回调，用于初始化 syscall.NewCallback
+func dummyEnumProc(hMonitor HMONITOR, hdcMonitor HDC, lprcMonitor *RECT, dwData uintptr) uintptr {
+	return 1
+}
+
+// initCallbackSystem 通过调用 EnumDisplayMonitors 初始化回调系统
+// 这解决了直接调用 EnumWindows 时返回空结果的问题
+var callbackInitialized = false
+
+func ensureCallbackInitialized() {
+	if callbackInitialized {
+		return
+	}
+	callback := syscall.NewCallback(dummyEnumProc)
+	EnumDisplayMonitors(0, nil, callback, 0)
+	callbackInitialized = true
+}
+
 // GetAllWindows 获取所有可见窗口信息
 func GetAllWindows() ([]WindowInfo, error) {
-	// 触发 GDI/显示子系统初始化
-	// 这解决了直接调用 EnumWindows 时返回空结果的问题
-	// EnumDisplayMonitors 会初始化必要的内部状态
-	EnumDisplayMonitors(0, nil, syscall.NewCallback(func(HMONITOR, HDC, *RECT, uintptr) uintptr { return 1 }), 0)
+	// 确保回调系统已初始化
+	ensureCallbackInitialized()
 
 	data := &enumWindowData{
 		windows:    make([]WindowInfo, 0),
