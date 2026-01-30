@@ -162,25 +162,8 @@ func getProcessName(pid uint32) string {
 	return UTF16ToString(nameBuf)
 }
 
-// callbackSystemInitialized 标记回调系统是否已初始化
-var callbackSystemInitialized = false
-
-// ensureCallbackSystemInitialized 确保 Windows 回调系统已初始化
-// 通过调用 GetAllMonitors() 来触发必要的初始化
-func ensureCallbackSystemInitialized() {
-	if callbackSystemInitialized {
-		return
-	}
-	// 调用完整的 GetAllMonitors 来初始化回调系统
-	GetAllMonitors()
-	callbackSystemInitialized = true
-}
-
 // GetAllWindows 获取所有可见窗口信息
 func GetAllWindows() ([]WindowInfo, error) {
-	// 确保回调系统已初始化
-	ensureCallbackSystemInitialized()
-
 	data := &enumWindowData{
 		windows:    make([]WindowInfo, 0),
 		currentPid: GetCurrentProcessId(),
