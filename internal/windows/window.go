@@ -165,21 +165,26 @@ func getProcessName(pid uint32) string {
 // callbackSystemInitialized 标记回调系统是否已初始化
 var callbackSystemInitialized = false
 
+// initCallback 是初始化用的回调函数
+// 在回调中调用 GetMonitorInfoW 来触发必要的初始化
+func initCallback(hMonitor HMONITOR, hdcMonitor HDC, lprcMonitor *RECT, dwData uintptr) uintptr {
+	var mi MONITORINFOEXW
+	mi.CbSize = uint32(unsafe.Sizeof(mi))
+	GetMonitorInfoW(hMonitor, &mi)
+	return 0 // 只需要第一个就够了，返回 0 停止枚举
+}
+
 // ensureCallbackSystemInitialized 确保 Windows 回调系统已初始化
 //
 // 背景: Go 的 syscall.NewCallback 在 Windows 上存在一个特殊行为：
 // 直接调用 EnumWindows 的回调可能无法正常工作。
-// 通过先调用 GetMonitorInfoW 可以使后续的 EnumWindows 回调正常工作。
+// 必须先在一个回调函数内调用 GetMonitorInfoW 来触发某种初始化。
 func ensureCallbackSystemInitialized() {
 	if callbackSystemInitialized {
 		return
 	}
-	// 尝试只调用 GetMonitorInfoW（不通过回调）
-	var mi MONITORINFOEXW
-	mi.CbSize = uint32(unsafe.Sizeof(mi))
-	// 使用主显示器的坐标获取显示器句柄
-	// MonitorFromPoint 需要添加
-	GetMonitorInfoW(0, &mi) // 即使失败也没关系，只是为了触发初始化
+	callback := syscall.NewCallback(initCallback)
+	EnumDisplayMonitors(0, nil, callback, 0)
 	callbackSystemInitialized = true
 }
 
