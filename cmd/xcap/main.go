@@ -99,7 +99,8 @@ func captureWindows(outputDir string) int {
 
 	captured := 0
 	for i, w := range windows {
-		if w.IsMinimized() || w.Width() < 50 || w.Height() < 50 {
+		minimized, _ := w.IsMinimized()
+		if minimized || w.Width() < 50 || w.Height() < 50 {
 			continue
 		}
 

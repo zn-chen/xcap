@@ -78,9 +78,12 @@ func TestAllWindows(t *testing.T) {
 	t.Logf("Found %d windows", len(windows))
 
 	for i, w := range windows {
+		minimized, _ := w.IsMinimized()
+		maximized, _ := w.IsMaximized()
+		focused, _ := w.IsFocused()
 		t.Logf("Window %d: ID=%d, PID=%d, App=%s, Title=%s, Position=(%d,%d), Size=%dx%d, Minimized=%v, Maximized=%v, Focused=%v",
 			i, w.ID(), w.PID(), w.AppName(), w.Title(), w.X(), w.Y(), w.Width(), w.Height(),
-			w.IsMinimized(), w.IsMaximized(), w.IsFocused())
+			minimized, maximized, focused)
 	}
 }
 
@@ -92,7 +95,8 @@ func TestWindowCapture(t *testing.T) {
 
 	// Find first large enough window
 	for _, w := range wins {
-		if w.Width() > 200 && w.Height() > 200 && !w.IsMinimized() {
+		minimized, _ := w.IsMinimized()
+		if w.Width() > 200 && w.Height() > 200 && !minimized {
 			t.Logf("Capturing: %s - %s", w.AppName(), w.Title())
 
 			img, err := w.CaptureImage()

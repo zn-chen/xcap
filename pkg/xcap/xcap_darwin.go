@@ -22,9 +22,9 @@ func (w *windowWrapper) Y() int            { return w.w.Y() }
 func (w *windowWrapper) Z() int            { return w.w.Z() }
 func (w *windowWrapper) Width() uint32     { return w.w.Width() }
 func (w *windowWrapper) Height() uint32    { return w.w.Height() }
-func (w *windowWrapper) IsMinimized() bool { return w.w.IsMinimized() }
-func (w *windowWrapper) IsMaximized() bool { return w.w.IsMaximized() }
-func (w *windowWrapper) IsFocused() bool   { return w.w.IsFocused() }
+func (w *windowWrapper) IsMinimized() (bool, error) { return w.w.IsMinimized() }
+func (w *windowWrapper) IsMaximized() (bool, error) { return w.w.IsMaximized() }
+func (w *windowWrapper) IsFocused() (bool, error)   { return w.w.IsFocused() }
 
 func (w *windowWrapper) CurrentMonitor() (Monitor, error) {
 	m, err := w.w.CurrentMonitor()

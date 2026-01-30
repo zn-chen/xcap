@@ -81,18 +81,18 @@ func (w *Window) Height() uint32 {
 }
 
 // IsMinimized 返回窗口是否最小化
-func (w *Window) IsMinimized() bool {
-	return IsWindowMinimized(w.info.Handle)
+func (w *Window) IsMinimized() (bool, error) {
+	return IsWindowMinimized(w.info.Handle), nil
 }
 
 // IsMaximized 返回窗口是否最大化
-func (w *Window) IsMaximized() bool {
-	return IsWindowMaximized(w.info.Handle)
+func (w *Window) IsMaximized() (bool, error) {
+	return IsWindowMaximized(w.info.Handle), nil
 }
 
 // IsFocused 返回窗口是否拥有输入焦点
-func (w *Window) IsFocused() bool {
-	return IsWindowFocused(w.info.Handle)
+func (w *Window) IsFocused() (bool, error) {
+	return IsWindowFocused(w.info.Handle), nil
 }
 
 // CurrentMonitor 返回窗口所在的显示器

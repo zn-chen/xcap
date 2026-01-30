@@ -82,20 +82,22 @@ func (w *Window) Height() uint32 {
 	return w.info.Height
 }
 
-// IsMinimized 返回窗口是否最小化（最小版本暂未实现）
-func (w *Window) IsMinimized() bool {
-	return false // TODO: 在完整版本中实现
+// IsMinimized 返回窗口是否最小化
+// macOS 上需要 Accessibility 权限，当前未实现
+func (w *Window) IsMinimized() (bool, error) {
+	return false, ErrNotSupported
 }
 
-// IsMaximized 返回窗口是否最大化（最小版本暂未实现）
-func (w *Window) IsMaximized() bool {
-	return false // TODO: 在完整版本中实现
+// IsMaximized 返回窗口是否最大化
+// macOS 上需要 Accessibility 权限，当前未实现
+func (w *Window) IsMaximized() (bool, error) {
+	return false, ErrNotSupported
 }
 
 // IsFocused 返回窗口是否拥有输入焦点
-func (w *Window) IsFocused() bool {
+func (w *Window) IsFocused() (bool, error) {
 	frontID := GetFrontmostWindowID()
-	return w.info.ID == frontID
+	return w.info.ID == frontID, nil
 }
 
 // CurrentMonitor 返回窗口所在的显示器（最小版本暂未实现）

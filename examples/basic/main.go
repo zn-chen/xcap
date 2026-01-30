@@ -117,9 +117,12 @@ func demoWindows(outputDir string) {
 		fmt.Printf("  Position:    (%d, %d)\n", w.X(), w.Y())
 		fmt.Printf("  Size:        %d x %d\n", w.Width(), w.Height())
 		fmt.Printf("  Z-Order:     %d\n", w.Z())
-		fmt.Printf("  Minimized:   %v\n", w.IsMinimized())
-		fmt.Printf("  Maximized:   %v\n", w.IsMaximized())
-		fmt.Printf("  Focused:     %v\n", w.IsFocused())
+		minimized, _ := w.IsMinimized()
+		maximized, _ := w.IsMaximized()
+		focused, _ := w.IsFocused()
+		fmt.Printf("  Minimized:   %v\n", minimized)
+		fmt.Printf("  Maximized:   %v\n", maximized)
+		fmt.Printf("  Focused:     %v\n", focused)
 
 		// 截取窗口
 		img, err := w.CaptureImage()

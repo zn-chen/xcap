@@ -32,13 +32,16 @@ type Window interface {
 	Height() uint32
 
 	// IsMinimized 返回窗口是否最小化
-	IsMinimized() bool
+	// 如果平台不支持该功能，返回 ErrNotSupported
+	IsMinimized() (bool, error)
 
 	// IsMaximized 返回窗口是否最大化
-	IsMaximized() bool
+	// 如果平台不支持该功能，返回 ErrNotSupported
+	IsMaximized() (bool, error)
 
 	// IsFocused 返回窗口是否拥有输入焦点
-	IsFocused() bool
+	// 如果平台不支持该功能，返回 ErrNotSupported
+	IsFocused() (bool, error)
 
 	// CurrentMonitor 返回窗口所在的显示器
 	CurrentMonitor() (Monitor, error)
