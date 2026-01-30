@@ -1,10 +1,10 @@
-# owl-go 架构设计
+# xcap 架构设计
 
 基于 xcap 的 Go 语言跨平台屏幕截图库。
 
 ## 项目概述
 
-owl-go 是一个 Go 语言实现的跨平台屏幕和窗口截图库，参考 Rust 库 [xcap](https://github.com/nashaofu/xcap) 的设计和实现。
+xcap 是一个 Go 语言实现的跨平台屏幕和窗口截图库，参考 Rust 库 [xcap](https://github.com/nashaofu/xcap) 的设计和实现。
 
 ## 功能特性
 
@@ -21,13 +21,13 @@ owl-go 是一个 Go 语言实现的跨平台屏幕和窗口截图库，参考 Ru
 ## 项目结构
 
 ```
-owl-go/
+xcap/
 ├── doc/                          # 文档
 │   ├── macos-implementation.md   # macOS 实现原理
 │   ├── windows-implementation.md # Windows 实现原理
 │   └── architecture.md           # 架构设计
 ├── pkg/
-│   └── owl/                      # 主包
+│   └── xcap/                     # 主包
 │       ├── monitor.go            # 显示器接口
 │       ├── window.go             # 窗口接口
 │       ├── capture.go            # 截图通用逻辑
@@ -57,7 +57,7 @@ owl-go/
 ### Monitor 接口
 
 ```go
-package owl
+package xcap
 
 import "image"
 
@@ -95,7 +95,7 @@ func MonitorFromPoint(x, y int) (Monitor, error)
 ### Window 接口
 
 ```go
-package owl
+package xcap
 
 import "image"
 
@@ -192,7 +192,7 @@ func CaptureImage() (*image.RGBA, error) {
 ## 错误处理
 
 ```go
-package owl
+package xcap
 
 import "errors"
 
@@ -204,17 +204,17 @@ var (
     ErrWindowMinimized = errors.New("window is minimized")
 )
 
-// OwlError 包装平台特定错误
-type OwlError struct {
+// XcapError 包装平台特定错误
+type XcapError struct {
     Op      string  // 操作名称
-    Err     error   // 底层错误
+    Err     error   // ��层错误
 }
 
-func (e *OwlError) Error() string {
-    return fmt.Sprintf("owl: %s: %v", e.Op, e.Err)
+func (e *XcapError) Error() string {
+    return fmt.Sprintf("xcap: %s: %v", e.Op, e.Err)
 }
 
-func (e *OwlError) Unwrap() error {
+func (e *XcapError) Unwrap() error {
     return e.Err
 }
 ```

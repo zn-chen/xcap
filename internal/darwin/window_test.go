@@ -63,7 +63,7 @@ func TestCaptureWindow(t *testing.T) {
 	}
 
 	// Save to file for manual inspection
-	f, err := os.Create("/tmp/owl_window_test.png")
+	f, err := os.Create("/tmp/xcap_window_test.png")
 	if err != nil {
 		t.Fatalf("Failed to create file: %v", err)
 	}
@@ -73,7 +73,7 @@ func TestCaptureWindow(t *testing.T) {
 		t.Fatalf("Failed to encode PNG: %v", err)
 	}
 
-	t.Logf("Saved screenshot to /tmp/owl_window_test.png")
+	t.Logf("Saved screenshot to /tmp/xcap_window_test.png")
 }
 
 func TestAllWindows(t *testing.T) {

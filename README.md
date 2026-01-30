@@ -1,4 +1,4 @@
-# owl-go
+# xcap
 
 跨平台屏幕和窗口截图 Go 语言库，参考 [xcap](https://github.com/nashaofu/xcap) 实现。
 
@@ -12,7 +12,7 @@
 ## 安装
 
 ```bash
-go get github.com/anthropic-research/owl-go
+go get github.com/anthropic-research/xcap
 ```
 
 ## 快速开始
@@ -27,11 +27,11 @@ import (
     "image/png"
     "os"
 
-    "github.com/anthropic-research/owl-go/pkg/owl"
+    "github.com/anthropic-research/xcap/pkg/xcap"
 )
 
 func main() {
-    monitors, err := owl.AllMonitors()
+    monitors, err := xcap.AllMonitors()
     if err != nil {
         log.Fatal(err)
     }
@@ -60,11 +60,11 @@ import (
     "image/png"
     "os"
 
-    "github.com/anthropic-research/owl-go/pkg/owl"
+    "github.com/anthropic-research/xcap/pkg/xcap"
 )
 
 func main() {
-    windows, err := owl.AllWindows()
+    windows, err := xcap.AllWindows()
     if err != nil {
         log.Fatal(err)
     }

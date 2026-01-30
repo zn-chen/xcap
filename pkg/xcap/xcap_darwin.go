@@ -1,14 +1,14 @@
 //go:build darwin
 
-package owl
+package xcap
 
 import (
 	"image"
 
-	"github.com/anthropic-research/owl-go/internal/darwin"
+	"github.com/anthropic-research/xcap/internal/darwin"
 )
 
-// windowWrapper 包装 darwin.Window 以实现 owl.Window 接口
+// windowWrapper 包装 darwin.Window 以实现 xcap.Window 接口
 type windowWrapper struct {
 	w *darwin.Window
 }

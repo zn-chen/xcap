@@ -5,7 +5,7 @@
 
 ## 概述
 
-实现 owl-go 的 macOS 平台支持，包括显示器枚举、窗口枚举和截图功能。
+实现 xcap 的 macOS 平台支持，包括显示器枚举、窗口枚举和截图功能。
 
 ## 设计决策
 
@@ -47,14 +47,14 @@
 ## 文件结构
 
 ```
-owl-go/
-├── pkg/owl/
+xcap/
+├── pkg/xcap/
 │   ├── monitor.go              # Monitor 接口定义
 │   ├── window.go               # Window 接口定义
 │   ├── errors.go               # 错误定义
-│   ├── owl_darwin.go           # //go:build darwin
+│   ├── xcap_darwin.go          # //go:build darwin
 │   │                           # 实现 AllMonitors(), AllWindows()
-│   └── owl_stub.go             # //go:build !darwin && !windows
+│   └── xcap_stub.go            # //go:build !darwin && !windows
 │                               # 返回 ErrNotSupported
 │
 ├── internal/darwin/
@@ -63,7 +63,7 @@ owl-go/
 │   │                           # - 函数声明
 │   │
 │   ├── bridge.m                # Objective-C 实现
-│   │                           # - 调用 Core Graphics API
+│   │                           # - 调�� Core Graphics API
 │   │                           # - 调用 AppKit API
 │   │
 │   ├── bridge.go               # CGO 桥接层
@@ -71,10 +71,10 @@ owl-go/
 │   │                           # - Go 调用 C 函数的封装
 │   │
 │   ├── monitor.go              # darwinMonitor 结构体
-│   │                           # - 实现 owl.Monitor 接口
+│   │                           # - 实现 xcap.Monitor 接口
 │   │
 │   ├── window.go               # darwinWindow 结构体
-│   │                           # - 实现 owl.Window 接口
+│   │                           # - 实现 xcap.Window 接口
 │   │
 │   └── capture.go              # 图像处理
 │                               # - BGRA → RGBA 转换
@@ -92,7 +92,7 @@ AllMonitors()
 bridge.go: GetAllMonitors()
     │
     ▼
-bridge.m: owl_get_all_monitors()
+bridge.m: xcap_get_all_monitors()
     │
     ├── CGGetActiveDisplayList()     获取显示器 ID 列表
     ├── CGDisplayBounds()            获取位置和尺寸
@@ -102,7 +102,7 @@ bridge.m: owl_get_all_monitors()
 返回 []MonitorInfo 结构体
     │
     ▼
-monitor.go: 转换为 []owl.Monitor
+monitor.go: 转换为 []xcap.Monitor
 ```
 
 ### 窗口枚举流程
@@ -114,7 +114,7 @@ AllWindows()
 bridge.go: GetAllWindows()
     │
     ▼
-bridge.m: owl_get_all_windows()
+bridge.m: xcap_get_all_windows()
     │
     ├── CGWindowListCopyWindowInfo()  获取窗口列表
     ├── 遍历 CFArray
@@ -129,7 +129,7 @@ bridge.m: owl_get_all_windows()
 返回 []WindowInfo 结构体
     │
     ▼
-window.go: 转换为 []owl.Window
+window.go: 转换为 []xcap.Window
 ```
 
 ### 截图流程
@@ -141,7 +141,7 @@ CaptureImage()
 bridge.go: CaptureMonitor(id) 或 CaptureWindow(id)
     │
     ▼
-bridge.m: owl_capture_monitor() 或 owl_capture_window()
+bridge.m: xcap_capture_monitor() 或 xcap_capture_window()
     │
     ├── CGWindowListCreateImage()    核心截图函数
     ├── CGImageGetDataProvider()     获取数据提供者
@@ -171,7 +171,7 @@ typedef struct {
     int32_t y;
     uint32_t width;
     uint32_t height;
-} OwlMonitorInfo;
+} XcapMonitorInfo;
 
 // 窗口信息
 typedef struct {
@@ -183,7 +183,7 @@ typedef struct {
     int32_t y;
     uint32_t width;
     uint32_t height;
-} OwlWindowInfo;
+} XcapWindowInfo;
 
 // 截图结果
 typedef struct {
@@ -191,16 +191,16 @@ typedef struct {
     uint32_t width;
     uint32_t height;
     uint32_t bytes_per_row;
-} OwlCaptureResult;
+} XcapCaptureResult;
 
 // API 函数
-int owl_get_all_monitors(OwlMonitorInfo **monitors, int *count);
-int owl_get_all_windows(OwlWindowInfo **windows, int *count);
-int owl_capture_monitor(uint32_t display_id, OwlCaptureResult *result);
-int owl_capture_window(uint32_t window_id, OwlCaptureResult *result);
-void owl_free_monitors(OwlMonitorInfo *monitors);
-void owl_free_windows(OwlWindowInfo *windows);
-void owl_free_capture_result(OwlCaptureResult *result);
+int xcap_get_all_monitors(XcapMonitorInfo **monitors, int *count);
+int xcap_get_all_windows(XcapWindowInfo **windows, int *count);
+int xcap_capture_monitor(uint32_t display_id, XcapCaptureResult *result);
+int xcap_capture_window(uint32_t window_id, XcapCaptureResult *result);
+void xcap_free_monitors(XcapMonitorInfo *monitors);
+void xcap_free_windows(XcapWindowInfo *windows);
+void xcap_free_capture_result(XcapCaptureResult *result);
 ```
 
 ## 窗口过滤规则
@@ -229,24 +229,24 @@ void owl_free_capture_result(OwlCaptureResult *result);
 - [ ] 验收: `go build ./internal/darwin` 编译通过
 
 ### Phase 2: Monitor 实现
-- [ ] 实现 `owl_get_all_monitors()` - 显示器枚举
+- [ ] 实现 `xcap_get_all_monitors()` - 显示器枚举
 - [ ] 创建 `internal/darwin/monitor.go` - darwinMonitor 结构体
-- [ ] 实现 `owl_capture_monitor()` - 屏幕截图
+- [ ] 实现 `xcap_capture_monitor()` - 屏幕截图
 - [ ] 创建 `internal/darwin/capture.go` - BGRA→RGBA 转换
 - [ ] 验收: 能枚举显示器并截图保存为 PNG
 
 ### Phase 3: Window 实现
-- [ ] 实现 `owl_get_all_windows()` - 窗口枚举
+- [ ] 实现 `xcap_get_all_windows()` - 窗口枚举
 - [ ] 创建 `internal/darwin/window.go` - darwinWindow 结构体
-- [ ] 实现 `owl_capture_window()` - 窗口截图
+- [ ] 实现 `xcap_capture_window()` - 窗口截图
 - [ ] 验收: 能枚举窗口并截图保存为 PNG
 
 ### Phase 4: 公共 API 集成
-- [ ] 创建 `pkg/owl/owl_darwin.go` - AllMonitors(), AllWindows()
-- [ ] 创建 `pkg/owl/owl_stub.go` - 非 darwin 平台返回错误
+- [ ] 创建 `pkg/xcap/xcap_darwin.go` - AllMonitors(), AllWindows()
+- [ ] 创建 `pkg/xcap/xcap_stub.go` - 非 darwin 平台返回错误
 - [ ] 创建 `examples/monitor_capture/main.go` - 示例代码
 - [ ] 创建 `examples/window_capture/main.go` - 示例代码
-- [ ] 验收: 用户可以 import "owl-go/pkg/owl" 使用
+- [ ] 验收: 用��可以 import "xcap/pkg/xcap" 使用
 
 ## 依赖
 
@@ -265,4 +265,4 @@ void owl_free_capture_result(OwlCaptureResult *result);
 
 - [xcap macOS 实现](https://github.com/nashaofu/xcap/tree/main/src/macos)
 - [Core Graphics 文档](https://developer.apple.com/documentation/coregraphics)
-- [CGWindowListCreateImage](https://developer.apple.com/documentation/coregraphics/1454
+- [CGWindowListCreateImage](https://developer.apple.com/documentation/coregraphics/1454)

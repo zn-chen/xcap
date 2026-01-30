@@ -1,15 +1,15 @@
-#ifndef OWL_BRIDGE_H
-#define OWL_BRIDGE_H
+#ifndef XCAP_BRIDGE_H
+#define XCAP_BRIDGE_H
 
 #include <stdint.h>
 
 // Error codes
-#define OWL_OK 0
-#define OWL_ERR_NO_MONITORS 1
-#define OWL_ERR_NO_WINDOWS 2
-#define OWL_ERR_CAPTURE_FAILED 3
-#define OWL_ERR_ALLOC_FAILED 4
-#define OWL_ERR_NOT_FOUND 5
+#define XCAP_OK 0
+#define XCAP_ERR_NO_MONITORS 1
+#define XCAP_ERR_NO_WINDOWS 2
+#define XCAP_ERR_CAPTURE_FAILED 3
+#define XCAP_ERR_ALLOC_FAILED 4
+#define XCAP_ERR_NOT_FOUND 5
 
 // Monitor information
 typedef struct {
@@ -19,7 +19,7 @@ typedef struct {
     int32_t y;
     uint32_t width;
     uint32_t height;
-} OwlMonitorInfo;
+} XcapMonitorInfo;
 
 // Window information
 typedef struct {
@@ -31,7 +31,7 @@ typedef struct {
     int32_t y;
     uint32_t width;
     uint32_t height;
-} OwlWindowInfo;
+} XcapWindowInfo;
 
 // Capture result
 typedef struct {
@@ -40,19 +40,19 @@ typedef struct {
     uint32_t height;
     uint32_t bytes_per_row;
     uint32_t data_length;
-} OwlCaptureResult;
+} XcapCaptureResult;
 
 // Monitor functions
-int owl_get_all_monitors(OwlMonitorInfo **monitors, int *count);
-void owl_free_monitors(OwlMonitorInfo *monitors);
-int owl_capture_monitor(uint32_t display_id, OwlCaptureResult *result);
+int xcap_get_all_monitors(XcapMonitorInfo **monitors, int *count);
+void xcap_free_monitors(XcapMonitorInfo *monitors);
+int xcap_capture_monitor(uint32_t display_id, XcapCaptureResult *result);
 
 // Window functions
-int owl_get_all_windows(OwlWindowInfo **windows, int *count);
-void owl_free_windows(OwlWindowInfo *windows);
-int owl_capture_window(uint32_t window_id, OwlCaptureResult *result);
+int xcap_get_all_windows(XcapWindowInfo **windows, int *count);
+void xcap_free_windows(XcapWindowInfo *windows);
+int xcap_capture_window(uint32_t window_id, XcapCaptureResult *result);
 
 // Capture cleanup
-void owl_free_capture_result(OwlCaptureResult *result);
+void xcap_free_capture_result(XcapCaptureResult *result);
 
-#endif // OWL_BRIDGE_H
+#endif // XCAP_BRIDGE_H

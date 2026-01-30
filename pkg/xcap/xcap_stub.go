@@ -1,6 +1,6 @@
 //go:build !darwin && !windows
 
-package owl
+package xcap
 
 // AllMonitors 返回系统上所有可用的显示器
 func AllMonitors() ([]Monitor, error) {

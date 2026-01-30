@@ -17,12 +17,12 @@ import (
 
 // 错误码，与 bridge.h 中的定义对应
 const (
-	errOK            = C.OWL_OK
-	errNoMonitors    = C.OWL_ERR_NO_MONITORS
-	errNoWindows     = C.OWL_ERR_NO_WINDOWS
-	errCaptureFailed = C.OWL_ERR_CAPTURE_FAILED
-	errAllocFailed   = C.OWL_ERR_ALLOC_FAILED
-	errNotFound      = C.OWL_ERR_NOT_FOUND
+	errOK            = C.XCAP_OK
+	errNoMonitors    = C.XCAP_ERR_NO_MONITORS
+	errNoWindows     = C.XCAP_ERR_NO_WINDOWS
+	errCaptureFailed = C.XCAP_ERR_CAPTURE_FAILED
+	errAllocFailed   = C.XCAP_ERR_ALLOC_FAILED
+	errNotFound      = C.XCAP_ERR_NOT_FOUND
 )
 
 // MonitorInfo 表示从 C 层获取的显示器信息
@@ -57,14 +57,14 @@ type CaptureResult struct {
 
 // GetAllMonitors 返回所有活动显示器的信息
 func GetAllMonitors() ([]MonitorInfo, error) {
-	var cMonitors *C.OwlMonitorInfo
+	var cMonitors *C.XcapMonitorInfo
 	var cCount C.int
 
-	result := C.owl_get_all_monitors(&cMonitors, &cCount)
+	result := C.xcap_get_all_monitors(&cMonitors, &cCount)
 	if result != errOK {
 		return nil, fmt.Errorf("failed to get monitors: error code %d", result)
 	}
-	defer C.owl_free_monitors(cMonitors)
+	defer C.xcap_free_monitors(cMonitors)
 
 	if cCount == 0 {
 		return nil, nil
@@ -93,14 +93,14 @@ func GetAllMonitors() ([]MonitorInfo, error) {
 
 // GetAllWindows 返回所有可见窗口的信息
 func GetAllWindows() ([]WindowInfo, error) {
-	var cWindows *C.OwlWindowInfo
+	var cWindows *C.XcapWindowInfo
 	var cCount C.int
 
-	result := C.owl_get_all_windows(&cWindows, &cCount)
+	result := C.xcap_get_all_windows(&cWindows, &cCount)
 	if result != errOK {
 		return nil, fmt.Errorf("failed to get windows: error code %d", result)
 	}
-	defer C.owl_free_windows(cWindows)
+	defer C.xcap_free_windows(cWindows)
 
 	if cCount == 0 {
 		return nil, nil
@@ -131,13 +131,13 @@ func GetAllWindows() ([]WindowInfo, error) {
 
 // CaptureMonitor 截取指定显示器，返回原始 BGRA 数据
 func CaptureMonitor(displayID uint32) (*CaptureResult, error) {
-	var cResult C.OwlCaptureResult
+	var cResult C.XcapCaptureResult
 
-	result := C.owl_capture_monitor(C.uint32_t(displayID), &cResult)
+	result := C.xcap_capture_monitor(C.uint32_t(displayID), &cResult)
 	if result != errOK {
 		return nil, fmt.Errorf("failed to capture monitor: error code %d", result)
 	}
-	defer C.owl_free_capture_result(&cResult)
+	defer C.xcap_free_capture_result(&cResult)
 
 	// 将数据复制到 Go slice
 	dataLen := int(cResult.data_length)
@@ -154,13 +154,13 @@ func CaptureMonitor(displayID uint32) (*CaptureResult, error) {
 
 // CaptureWindow 截取指定窗口，返回原始 BGRA 数据
 func CaptureWindow(windowID uint32) (*CaptureResult, error) {
-	var cResult C.OwlCaptureResult
+	var cResult C.XcapCaptureResult
 
-	result := C.owl_capture_window(C.uint32_t(windowID), &cResult)
+	result := C.xcap_capture_window(C.uint32_t(windowID), &cResult)
 	if result != errOK {
 		return nil, fmt.Errorf("failed to capture window: error code %d", result)
 	}
-	defer C.owl_free_capture_result(&cResult)
+	defer C.xcap_free_capture_result(&cResult)
 
 	// 将数据复制到 Go slice
 	dataLen := int(cResult.data_length)

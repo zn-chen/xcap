@@ -30,14 +30,14 @@ func GetAllMonitors() ([]Monitor, error) {
 
 ### 错误处理
 
-- 使用 `pkg/owl/errors.go` 中定义的标准错误
+- 使用 `pkg/xcap/errors.go` 中定义的标准错误
 - 错误消息使用英文
 
 ## 目录结构
 
 ```
-owl-go/
-├── pkg/owl/          # 公共 API（用户使用）
+xcap/
+├── pkg/xcap/         # 公共 API（用户使用）
 ├── internal/darwin/  # macOS 内部实现
 ├── internal/windows/ # Windows 内部实现
 ├── examples/         # 示例代码

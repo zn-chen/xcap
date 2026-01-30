@@ -37,12 +37,12 @@ go.work.sum
 ._*
 
 # Example output directories
-owl_output/
+xcap_output/
 output/
 /tmp/
 
 # Test artifacts
-/tmp/owl_*.png
+/tmp/xcap_*.png
 
 # Build cache
 .cache/

@@ -1,4 +1,4 @@
-// Package main 演示 owl-go 库的基本用法。
+// Package main 演示 xcap 库的基本用法。
 //
 // 本示例展示如何：
 // - 枚举所有显示器及其属性
@@ -17,15 +17,15 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/anthropic-research/owl-go/pkg/owl"
+	"github.com/anthropic-research/xcap/pkg/xcap"
 )
 
 func main() {
-	fmt.Println("=== owl-go Basic Example ===")
+	fmt.Println("=== xcap Basic Example ===")
 	fmt.Println()
 
 	// 创建输出目录
-	outputDir := "owl_output"
+	outputDir := "xcap_output"
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		log.Fatalf("Failed to create output directory: %v", err)
 	}
@@ -46,7 +46,7 @@ func main() {
 func demoMonitors(outputDir string) {
 	fmt.Println("--- Monitors ---")
 
-	monitors, err := owl.AllMonitors()
+	monitors, err := xcap.AllMonitors()
 	if err != nil {
 		log.Printf("Failed to get monitors: %v", err)
 		return
@@ -90,7 +90,7 @@ func demoMonitors(outputDir string) {
 func demoWindows(outputDir string) {
 	fmt.Println("--- Windows ---")
 
-	windows, err := owl.AllWindows()
+	windows, err := xcap.AllWindows()
 	if err != nil {
 		log.Printf("Failed to get windows: %v", err)
 		return

@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/anthropic-research/owl-go/pkg/owl"
+	"github.com/anthropic-research/xcap/pkg/xcap"
 )
 
 func sanitizeFilename(name string) string {
@@ -27,7 +27,7 @@ func sanitizeFilename(name string) string {
 
 func main() {
 	// Get all monitors
-	monitors, err := owl.AllMonitors()
+	monitors, err := xcap.AllMonitors()
 	if err != nil {
 		log.Fatalf("Failed to get monitors: %v", err)
 	}

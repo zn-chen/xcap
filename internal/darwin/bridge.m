@@ -22,7 +22,7 @@ static void copy_nsstring_to_buffer(NSString *str, char *buffer, size_t buffer_s
 
 #pragma mark - Monitor Functions
 
-int owl_get_all_monitors(OwlMonitorInfo **monitors, int *count) {
+int xcap_get_all_monitors(XcapMonitorInfo **monitors, int *count) {
     @autoreleasepool {
         // Get active display list
         uint32_t max_displays = 16;
@@ -33,15 +33,15 @@ int owl_get_all_monitors(OwlMonitorInfo **monitors, int *count) {
         if (err != kCGErrorSuccess || display_count == 0) {
             *monitors = NULL;
             *count = 0;
-            return OWL_ERR_NO_MONITORS;
+            return XCAP_ERR_NO_MONITORS;
         }
 
         // Allocate monitor info array
-        OwlMonitorInfo *result = (OwlMonitorInfo *)calloc(display_count, sizeof(OwlMonitorInfo));
+        XcapMonitorInfo *result = (XcapMonitorInfo *)calloc(display_count, sizeof(XcapMonitorInfo));
         if (result == NULL) {
             *monitors = NULL;
             *count = 0;
-            return OWL_ERR_ALLOC_FAILED;
+            return XCAP_ERR_ALLOC_FAILED;
         }
 
         // Get NSScreen array for friendly names
@@ -77,17 +77,17 @@ int owl_get_all_monitors(OwlMonitorInfo **monitors, int *count) {
 
         *monitors = result;
         *count = (int)display_count;
-        return OWL_OK;
+        return XCAP_OK;
     }
 }
 
-void owl_free_monitors(OwlMonitorInfo *monitors) {
+void xcap_free_monitors(XcapMonitorInfo *monitors) {
     if (monitors) {
         free(monitors);
     }
 }
 
-int owl_capture_monitor(uint32_t display_id, OwlCaptureResult *result) {
+int xcap_capture_monitor(uint32_t display_id, XcapCaptureResult *result) {
     @autoreleasepool {
         // Get display bounds
         CGRect bounds = CGDisplayBounds(display_id);
@@ -101,7 +101,7 @@ int owl_capture_monitor(uint32_t display_id, OwlCaptureResult *result) {
         );
 
         if (image == NULL) {
-            return OWL_ERR_CAPTURE_FAILED;
+            return XCAP_ERR_CAPTURE_FAILED;
         }
 
         // Get image properties
@@ -115,7 +115,7 @@ int owl_capture_monitor(uint32_t display_id, OwlCaptureResult *result) {
 
         if (data == NULL) {
             CGImageRelease(image);
-            return OWL_ERR_CAPTURE_FAILED;
+            return XCAP_ERR_CAPTURE_FAILED;
         }
 
         const uint8_t *src = CFDataGetBytePtr(data);
@@ -126,7 +126,7 @@ int owl_capture_monitor(uint32_t display_id, OwlCaptureResult *result) {
         if (result->data == NULL) {
             CFRelease(data);
             CGImageRelease(image);
-            return OWL_ERR_ALLOC_FAILED;
+            return XCAP_ERR_ALLOC_FAILED;
         }
 
         memcpy(result->data, src, data_length);
@@ -138,13 +138,13 @@ int owl_capture_monitor(uint32_t display_id, OwlCaptureResult *result) {
         CFRelease(data);
         CGImageRelease(image);
 
-        return OWL_OK;
+        return XCAP_OK;
     }
 }
 
 #pragma mark - Window Functions
 
-int owl_get_all_windows(OwlWindowInfo **windows, int *count) {
+int xcap_get_all_windows(XcapWindowInfo **windows, int *count) {
     @autoreleasepool {
         // Get window list
         CFArrayRef window_list = CGWindowListCopyWindowInfo(
@@ -155,7 +155,7 @@ int owl_get_all_windows(OwlWindowInfo **windows, int *count) {
         if (window_list == NULL) {
             *windows = NULL;
             *count = 0;
-            return OWL_ERR_NO_WINDOWS;
+            return XCAP_ERR_NO_WINDOWS;
         }
 
         CFIndex window_count = CFArrayGetCount(window_list);
@@ -163,7 +163,7 @@ int owl_get_all_windows(OwlWindowInfo **windows, int *count) {
             CFRelease(window_list);
             *windows = NULL;
             *count = 0;
-            return OWL_ERR_NO_WINDOWS;
+            return XCAP_ERR_NO_WINDOWS;
         }
 
         // First pass: count valid windows
@@ -199,16 +199,16 @@ int owl_get_all_windows(OwlWindowInfo **windows, int *count) {
             CFRelease(window_list);
             *windows = NULL;
             *count = 0;
-            return OWL_ERR_NO_WINDOWS;
+            return XCAP_ERR_NO_WINDOWS;
         }
 
         // Allocate result array
-        OwlWindowInfo *result = (OwlWindowInfo *)calloc(valid_count, sizeof(OwlWindowInfo));
+        XcapWindowInfo *result = (XcapWindowInfo *)calloc(valid_count, sizeof(XcapWindowInfo));
         if (result == NULL) {
             CFRelease(window_list);
             *windows = NULL;
             *count = 0;
-            return OWL_ERR_ALLOC_FAILED;
+            return XCAP_ERR_ALLOC_FAILED;
         }
 
         // Second pass: fill in window info
@@ -284,17 +284,17 @@ int owl_get_all_windows(OwlWindowInfo **windows, int *count) {
 
         *windows = result;
         *count = result_index;
-        return OWL_OK;
+        return XCAP_OK;
     }
 }
 
-void owl_free_windows(OwlWindowInfo *windows) {
+void xcap_free_windows(XcapWindowInfo *windows) {
     if (windows) {
         free(windows);
     }
 }
 
-int owl_capture_window(uint32_t window_id, OwlCaptureResult *result) {
+int xcap_capture_window(uint32_t window_id, XcapCaptureResult *result) {
     @autoreleasepool {
         // Get window bounds first
         CFArrayRef window_list = CGWindowListCopyWindowInfo(
@@ -304,7 +304,7 @@ int owl_capture_window(uint32_t window_id, OwlCaptureResult *result) {
 
         if (window_list == NULL || CFArrayGetCount(window_list) == 0) {
             if (window_list) CFRelease(window_list);
-            return OWL_ERR_NOT_FOUND;
+            return XCAP_ERR_NOT_FOUND;
         }
 
         CFDictionaryRef window_info = CFArrayGetValueAtIndex(window_list, 0);
@@ -325,7 +325,7 @@ int owl_capture_window(uint32_t window_id, OwlCaptureResult *result) {
         );
 
         if (image == NULL) {
-            return OWL_ERR_CAPTURE_FAILED;
+            return XCAP_ERR_CAPTURE_FAILED;
         }
 
         // Get image properties
@@ -339,7 +339,7 @@ int owl_capture_window(uint32_t window_id, OwlCaptureResult *result) {
 
         if (data == NULL) {
             CGImageRelease(image);
-            return OWL_ERR_CAPTURE_FAILED;
+            return XCAP_ERR_CAPTURE_FAILED;
         }
 
         const uint8_t *src = CFDataGetBytePtr(data);
@@ -350,7 +350,7 @@ int owl_capture_window(uint32_t window_id, OwlCaptureResult *result) {
         if (result->data == NULL) {
             CFRelease(data);
             CGImageRelease(image);
-            return OWL_ERR_ALLOC_FAILED;
+            return XCAP_ERR_ALLOC_FAILED;
         }
 
         memcpy(result->data, src, data_length);
@@ -362,13 +362,13 @@ int owl_capture_window(uint32_t window_id, OwlCaptureResult *result) {
         CFRelease(data);
         CGImageRelease(image);
 
-        return OWL_OK;
+        return XCAP_OK;
     }
 }
 
 #pragma mark - Cleanup
 
-void owl_free_capture_result(OwlCaptureResult *result) {
+void xcap_free_capture_result(XcapCaptureResult *result) {
     if (result && result->data) {
         free(result->data);
         result->data = NULL;

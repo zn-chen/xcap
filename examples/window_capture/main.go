@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/anthropic-research/owl-go/pkg/owl"
+	"github.com/anthropic-research/xcap/pkg/xcap"
 )
 
 func sanitizeFilename(name string) string {
@@ -32,7 +32,7 @@ func sanitizeFilename(name string) string {
 
 func main() {
 	// Get all windows
-	windows, err := owl.AllWindows()
+	windows, err := xcap.AllWindows()
 	if err != nil {
 		log.Fatalf("Failed to get windows: %v", err)
 	}
