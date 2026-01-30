@@ -165,12 +165,15 @@ func getProcessName(pid uint32) string {
 // callbackSystemInitialized 标记回调系统是否已初始化
 var callbackSystemInitialized = false
 
+// dummyValue 用于防止编译器优化
+var dummyValue int
+
 // initCallback 是初始化用的回调函数
-// 在回调中调用一个 Windows API 来触发必要的初始化
+// 测试：不调用任何 Windows API，只做 Go 操作
 func initCallback(hMonitor HMONITOR, hdcMonitor HDC, lprcMonitor *RECT, dwData uintptr) uintptr {
-	// 测试：只调用 GetDesktopWindow 而不是 GetMonitorInfoW
-	GetDesktopWindow()
-	return 0 // 只需要第一个就够了，返回 0 停止枚举
+	// 只做一些 Go 操作，不调用 Windows API
+	dummyValue = 42
+	return 0
 }
 
 // ensureCallbackSystemInitialized 确保 Windows 回调系统已初始化
