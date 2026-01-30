@@ -7,6 +7,16 @@ import (
 	"unsafe"
 )
 
+// init 确保所有 DLL 被正确加载
+// 这解决了某些情况下 LazyDLL 延迟加载导致的问题
+func init() {
+	// 预加载关键 DLL
+	user32.Load()
+	gdi32.Load()
+	kernel32.Load()
+	dwmapi.Load()
+}
+
 var (
 	user32   = syscall.NewLazyDLL("user32.dll")
 	gdi32    = syscall.NewLazyDLL("gdi32.dll")
