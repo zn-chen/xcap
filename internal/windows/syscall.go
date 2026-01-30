@@ -61,6 +61,10 @@ var (
 
 	// psapi.dll
 	procGetModuleBaseNameW = psapi.NewProc("GetModuleBaseNameW")
+
+	// ntdll.dll (for OS version)
+	ntdll                   = syscall.NewLazyDLL("ntdll.dll")
+	procRtlGetNtVersionNumbers = ntdll.NewProc("RtlGetNtVersionNumbers")
 )
 
 // Windows 常量定义
@@ -80,8 +84,10 @@ const (
 
 	WS_VISIBLE = 0x10000000
 
-	PW_CLIENTONLY    = 1
-	PW_RENDERFULLCONTENT = 2
+	// PrintWindow 标志
+	PW_CLIENTONLY        = 1
+	PW_RENDERFULLCONTENT = 2 // Windows 8.1+
+	PW_DEFAULT           = 0
 
 	DWMWA_CLOAKED              = 14
 	DWMWA_EXTENDED_FRAME_BOUNDS = 9
@@ -424,6 +430,18 @@ func GetDpiForMonitor(hMonitor HMONITOR, dpiType uint32, dpiX, dpiY *uint32) int
 		uintptr(unsafe.Pointer(dpiY)),
 	)
 	return int32(ret)
+}
+
+// GetOSMajorVersion 获取 Windows 主版本号
+// Windows 8 = 6.2, Windows 8.1 = 6.3, Windows 10 = 10.0
+func GetOSMajorVersion() uint32 {
+	var major, minor, build uint32
+	procRtlGetNtVersionNumbers.Call(
+		uintptr(unsafe.Pointer(&major)),
+		uintptr(unsafe.Pointer(&minor)),
+		uintptr(unsafe.Pointer(&build)),
+	)
+	return major
 }
 
 // UTF16ToString 将 UTF16 转换为 Go 字符串

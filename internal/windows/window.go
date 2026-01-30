@@ -32,8 +32,8 @@ func NewWindow(info WindowInfo) *Window {
 
 // 用于枚举窗口的回调数据
 type enumWindowData struct {
-	windows       []WindowInfo
-	currentPid    uint32
+	windows    []WindowInfo
+	currentPid uint32
 }
 
 // isWindowCloaked 检查窗口是否被隐藏（DWM cloaked）
@@ -261,6 +261,11 @@ func (w *Window) CaptureImage() (*image.RGBA, error) {
 }
 
 // CaptureWindow 截取指定窗口
+// 与 xcap Rust 实现保持一致的捕获策略：
+// 1. Windows 8+ 使用 PrintWindow(flag=2)
+// 2. DWM 合成启用时使用 PrintWindow(flag=0)
+// 3. 使用 PrintWindow(flag=4)
+// 4. 最后使用 BitBlt 作为回退
 func CaptureWindow(info WindowInfo) (*image.RGBA, error) {
 	hwnd := info.Handle
 
@@ -268,11 +273,6 @@ func CaptureWindow(info WindowInfo) (*image.RGBA, error) {
 	var rect RECT
 	if !GetWindowRect(hwnd, &rect) {
 		return nil, ErrCaptureFailed
-	}
-
-	// 尝试获取 DWM 扩展边框
-	if extRect, ok := getWindowExtendedFrameBounds(hwnd); ok {
-		rect = extRect
 	}
 
 	width := rect.Right - rect.Left
@@ -307,30 +307,36 @@ func CaptureWindow(info WindowInfo) (*image.RGBA, error) {
 	oldBitmap := SelectObject(hdcMem, HGDIOBJ(hBitmap))
 	defer SelectObject(hdcMem, oldBitmap)
 
-	// 尝试多种捕获方式（参考 xcap 的 fallback 策略）
+	// 与 xcap Rust 一致的回退策略
 	captured := false
 
-	// 首先尝试 PrintWindow (PW_RENDERFULLCONTENT) - Windows 8.1+
-	if PrintWindow(hwnd, hdcMem, PW_RENDERFULLCONTENT) {
-		captured = true
-	}
-
-	// 如果失败，尝试 PrintWindow (PW_CLIENTONLY)
-	if !captured {
-		if PrintWindow(hwnd, hdcMem, PW_CLIENTONLY) {
+	// 1. Windows 8+ 使用 PrintWindow(flag=2) - PW_RENDERFULLCONTENT
+	if GetOSMajorVersion() >= 8 {
+		if PrintWindow(hwnd, hdcMem, PW_RENDERFULLCONTENT) {
 			captured = true
 		}
 	}
 
-	// 如果还是失败，使用 BitBlt 作为最后手段
+	// 2. DWM 合成启用时使用 PrintWindow(flag=0) - PW_DEFAULT
 	if !captured {
-		// 获取桌面 DC 作为源
-		hdcScreen := GetDC(0)
-		if hdcScreen != 0 {
-			defer ReleaseDC(0, hdcScreen)
-			if BitBlt(hdcMem, 0, 0, width, height, hdcScreen, rect.Left, rect.Top, SRCCOPY) {
+		if dwmEnabled, err := DwmIsCompositionEnabled(); err == nil && dwmEnabled {
+			if PrintWindow(hwnd, hdcMem, PW_DEFAULT) {
 				captured = true
 			}
+		}
+	}
+
+	// 3. 使用 PrintWindow(flag=4)
+	if !captured {
+		if PrintWindow(hwnd, hdcMem, 4) {
+			captured = true
+		}
+	}
+
+	// 4. 最后使用 BitBlt 作为回退（使用窗口 DC，与 xcap Rust 一致）
+	if !captured {
+		if BitBlt(hdcMem, 0, 0, width, height, hdcWindow, 0, 0, SRCCOPY) {
+			captured = true
 		}
 	}
 
