@@ -43,13 +43,9 @@ func TestCaptureMonitor(t *testing.T) {
 	t.Logf("Captured: %dx%d", img.Bounds().Dx(), img.Bounds().Dy())
 
 	// Save to file for manual inspection
-	f, err := os.Create("C:\\Temp\\xcap_monitor_test.png")
+	f, err := os.Create("xcap_monitor_test.png")
 	if err != nil {
-		// Try current directory if C:\Temp doesn't exist
-		f, err = os.Create("xcap_monitor_test.png")
-		if err != nil {
-			t.Fatalf("Failed to create file: %v", err)
-		}
+		t.Fatalf("Failed to create file: %v", err)
 	}
 	defer f.Close()
 
