@@ -266,11 +266,6 @@ static BOOL CALLBACK window_enum_callback(HWND hwnd, LPARAM lParam) {
         }
     }
 
-    // Filter no-redirection-bitmap windows
-    if (ex_style & WS_EX_NOREDIRECTIONBITMAP) {
-        return TRUE;
-    }
-
     // Filter system windows
     if (wcscmp(class_name, L"Progman") == 0 ||
         wcscmp(class_name, L"Button") == 0 ||
