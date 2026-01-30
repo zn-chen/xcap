@@ -164,6 +164,11 @@ func getProcessName(pid uint32) string {
 
 // GetAllWindows 获取所有可见窗口信息
 func GetAllWindows() ([]WindowInfo, error) {
+	// 触发 GDI/显示子系统初始化
+	// 这解决了直接调用 EnumWindows 时返回空结果的问题
+	// EnumDisplayMonitors 会初始化必要的内部状态
+	EnumDisplayMonitors(0, nil, syscall.NewCallback(func(HMONITOR, HDC, *RECT, uintptr) uintptr { return 1 }), 0)
+
 	data := &enumWindowData{
 		windows:    make([]WindowInfo, 0),
 		currentPid: GetCurrentProcessId(),
