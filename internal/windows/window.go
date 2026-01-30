@@ -162,8 +162,36 @@ func getProcessName(pid uint32) string {
 	return UTF16ToString(nameBuf)
 }
 
+// callbackSystemInitialized 标记回调系统是否已初始化
+var callbackSystemInitialized = false
+
+// fourParamCallback 是一个 4 参数的回调函数
+// Go 的 syscall.NewCallback 似乎需要先注册一个多参数回调才能正常工作
+func fourParamCallback(a, b, c, d uintptr) uintptr {
+	return 1
+}
+
+// ensureCallbackSystemInitialized 确保 Windows 回调系统已初始化
+//
+// 背景: Go 运行时的 syscall.NewCallback 在 Windows 上有一个问题，
+// 2 参数回调可能无法正常工作，除非先注册并执行一个多参数回调。
+// 通过先执行一次 EnumDisplayMonitors（4 参数回调），可以正确初始化运行时状态。
+// 参考: https://github.com/golang/go/issues/6751
+func ensureCallbackSystemInitialized() {
+	if callbackSystemInitialized {
+		return
+	}
+	// 使用 4 参数回调调用 EnumDisplayMonitors 来初始化回调系统
+	callback := syscall.NewCallback(fourParamCallback)
+	EnumDisplayMonitors(0, nil, callback, 0)
+	callbackSystemInitialized = true
+}
+
 // GetAllWindows 获取所有可见窗口信息
 func GetAllWindows() ([]WindowInfo, error) {
+	// 确保回调系统已初始化
+	ensureCallbackSystemInitialized()
+
 	data := &enumWindowData{
 		windows:    make([]WindowInfo, 0),
 		currentPid: GetCurrentProcessId(),
