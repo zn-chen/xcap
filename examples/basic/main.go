@@ -17,7 +17,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/anthropic-research/xcap/pkg/xcap"
+	"github.com/zn-chen/xcap/pkg/xcap"
 )
 
 func main() {

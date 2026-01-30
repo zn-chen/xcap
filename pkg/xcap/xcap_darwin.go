@@ -5,7 +5,7 @@ package xcap
 import (
 	"image"
 
-	"github.com/anthropic-research/xcap/internal/darwin"
+	"github.com/zn-chen/xcap/internal/darwin"
 )
 
 // windowWrapper 包装 darwin.Window 以实现 xcap.Window 接口

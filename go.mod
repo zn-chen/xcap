@@ -1,3 +1,3 @@
-module github.com/anthropic-research/xcap
+module github.com/zn-chen/xcap
 
 go 1.24.2

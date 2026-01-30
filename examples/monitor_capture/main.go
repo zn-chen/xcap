@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/anthropic-research/xcap/pkg/xcap"
+	"github.com/zn-chen/xcap/pkg/xcap"
 )
 
 func sanitizeFilename(name string) string {
