@@ -1,14 +1,19 @@
 # xcap Makefile
 
-.PHONY: clean
+VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
+LDFLAGS := -ldflags "-X main.version=$(VERSION)"
 
-# clean 清理构建产物和调试信息
+.PHONY: all build clean
+
+# 默认目标
+all: build
+
+# 构建当前平台
+build:
+	@mkdir -p bin
+	go build $(LDFLAGS) -o bin/xcap ./cmd/xcap/
+
+# 清理构建产物
 clean:
-	@echo "Cleaning build artifacts and debug files..."
-	@rm -rf xcap_output/
-	@rm -rf examples/basic/xcap_output/
-	@rm -f *.png
-	@rm -f *.log
 	@rm -rf bin/
-	@rm -rf dist/
-	@echo "Done."
+	@rm -rf output/
