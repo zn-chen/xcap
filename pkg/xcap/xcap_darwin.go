@@ -53,8 +53,15 @@ func AllMonitors() ([]Monitor, error) {
 	return result, nil
 }
 
-// AllWindows 返回系统上所有可见的窗口
+// AllWindows 返回系统上所有可见的窗口（包括当前进程的窗口）
 func AllWindows() ([]Window, error) {
+	return AllWindowsWithOptions(false)
+}
+
+// AllWindowsWithOptions 返回系统上所有可见的窗口
+// excludeCurrentProcess: 是否排除当前进程的窗口（macOS 上暂不支持，参数被忽略）
+func AllWindowsWithOptions(excludeCurrentProcess bool) ([]Window, error) {
+	// TODO: macOS 实现中添加 excludeCurrentProcess 支持
 	windows, err := darwin.AllWindows()
 	if err != nil {
 		return nil, err

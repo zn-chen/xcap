@@ -32,8 +32,9 @@ func NewWindow(info WindowInfo) *Window {
 
 // 用于枚举窗口的回调数据
 type enumWindowData struct {
-	windows    []WindowInfo
-	currentPid uint32
+	windows            []WindowInfo
+	currentPid         uint32
+	excludeCurrentPid  bool
 }
 
 // isWindowCloaked 检查窗口是否被隐藏（DWM cloaked）
@@ -68,8 +69,8 @@ func windowEnumCallback(hwnd HWND, lParam uintptr) uintptr {
 	var pid uint32
 	GetWindowThreadProcessId(hwnd, &pid)
 
-	// 跳过当前进程的窗口（避免死锁）
-	if pid == data.currentPid {
+	// 根据选项决定是否跳过当前进程的窗口
+	if data.excludeCurrentPid && pid == data.currentPid {
 		return 1
 	}
 
@@ -182,14 +183,21 @@ func ensureCallbackSystemInitialized() {
 	callbackSystemInitialized = true
 }
 
-// GetAllWindows 获取所有可见窗口信息
+// GetAllWindows 获取所有可见窗口信息（包括当前进程的窗口）
 func GetAllWindows() ([]WindowInfo, error) {
+	return GetAllWindowsWithOptions(false)
+}
+
+// GetAllWindowsWithOptions 获取所有可见窗口信息
+// excludeCurrentProcess: 是否排除当前进程的窗口
+func GetAllWindowsWithOptions(excludeCurrentProcess bool) ([]WindowInfo, error) {
 	// 确保回调系统已初始化
 	ensureCallbackSystemInitialized()
 
 	data := &enumWindowData{
-		windows:    make([]WindowInfo, 0),
-		currentPid: GetCurrentProcessId(),
+		windows:           make([]WindowInfo, 0),
+		currentPid:        GetCurrentProcessId(),
+		excludeCurrentPid: excludeCurrentProcess,
 	}
 
 	callback := syscall.NewCallback(windowEnumCallback)
@@ -198,9 +206,15 @@ func GetAllWindows() ([]WindowInfo, error) {
 	return data.windows, nil
 }
 
-// AllWindows 返回所有可见的窗口
+// AllWindows 返回所有可见的窗口（包括当前进程的窗口）
 func AllWindows() ([]*Window, error) {
-	infos, err := GetAllWindows()
+	return AllWindowsWithOptions(false)
+}
+
+// AllWindowsWithOptions 返回所有可见的窗口
+// excludeCurrentProcess: 是否排除当前进程的窗口
+func AllWindowsWithOptions(excludeCurrentProcess bool) ([]*Window, error) {
+	infos, err := GetAllWindowsWithOptions(excludeCurrentProcess)
 	if err != nil {
 		return nil, err
 	}
