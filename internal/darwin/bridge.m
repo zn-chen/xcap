@@ -410,6 +410,14 @@ void xcap_free_capture_result(XcapCaptureResult *result) {
 
 uint32_t xcap_get_frontmost_window_id(void) {
     @autoreleasepool {
+        // 获取当前激活的应用程序
+        NSRunningApplication *frontApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
+        if (frontApp == nil) {
+            return 0;
+        }
+        pid_t frontPID = [frontApp processIdentifier];
+
+        // 获取窗口列表
         CFArrayRef window_list = CGWindowListCopyWindowInfo(
             kCGWindowListOptionOnScreenOnly | kCGWindowListExcludeDesktopElements,
             kCGNullWindowID
@@ -420,12 +428,28 @@ uint32_t xcap_get_frontmost_window_id(void) {
             return 0;
         }
 
-        // The first window in the list is typically the frontmost
-        CFDictionaryRef window_info = CFArrayGetValueAtIndex(window_list, 0);
-        CFNumberRef window_id_ref = CFDictionaryGetValue(window_info, kCGWindowNumber);
+        // 查找属于前台应用的第一个窗口
+        CFIndex window_count = CFArrayGetCount(window_list);
         uint32_t window_id = 0;
-        if (window_id_ref) {
-            CFNumberGetValue(window_id_ref, kCFNumberIntType, &window_id);
+
+        for (CFIndex i = 0; i < window_count; i++) {
+            CFDictionaryRef window_info = CFArrayGetValueAtIndex(window_list, i);
+
+            // 获取窗口所属进程 PID
+            CFNumberRef pid_ref = CFDictionaryGetValue(window_info, kCGWindowOwnerPID);
+            int pid = 0;
+            if (pid_ref) {
+                CFNumberGetValue(pid_ref, kCFNumberIntType, &pid);
+            }
+
+            // 匹配前台应用的 PID
+            if (pid == frontPID) {
+                CFNumberRef window_id_ref = CFDictionaryGetValue(window_info, kCGWindowNumber);
+                if (window_id_ref) {
+                    CFNumberGetValue(window_id_ref, kCFNumberIntType, &window_id);
+                }
+                break;
+            }
         }
 
         CFRelease(window_list);

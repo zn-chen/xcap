@@ -121,7 +121,13 @@ func captureWindows(outputDir string) int {
 			continue
 		}
 
-		fmt.Printf("  窗口 %d: [%s] %s -> %s\n", i+1, w.AppName(), w.Title(), filename)
+		// 获取焦点状态
+		focusedMark := ""
+		if focused, err := w.IsFocused(); err == nil && focused {
+			focusedMark = " [焦点]"
+		}
+
+		fmt.Printf("  窗口 %d: [%s] %s%s -> %s\n", i+1, w.AppName(), w.Title(), focusedMark, filename)
 		captured++
 	}
 
