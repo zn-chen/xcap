@@ -74,6 +74,10 @@ The bridge layer handles memory management: Go code calls C functions that alloc
 - Requires Screen Recording permission
 - CGO flags: `-framework CoreGraphics -framework AppKit -framework CoreFoundation`
 - `IsMinimized`/`IsMaximized` return `ErrNotSupported` (require Accessibility API)
+- To suppress `duplicate libraries` warning when using `go build` directly:
+  ```bash
+  CGO_LDFLAGS="-Wl,-no_warn_duplicate_libraries" go build ./...
+  ```
 
 ### Windows
 - Uses GDI for capture, Win32 for window enumeration

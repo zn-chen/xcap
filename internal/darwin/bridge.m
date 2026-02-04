@@ -410,12 +410,23 @@ void xcap_free_capture_result(XcapCaptureResult *result) {
 
 uint32_t xcap_get_frontmost_window_id(void) {
     @autoreleasepool {
-        // 获取当前激活的应用程序
-        NSRunningApplication *frontApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
-        if (frontApp == nil) {
+        // 使用 activeApplication 获取实时的焦点应用
+        // 注意：activeApplication 虽已 deprecated，但 frontmostApplication 返回的是进程启动时的前台应用
+        // 而 activeApplication 返回的是实时的当前焦点应用
+        #pragma clang diagnostic push
+        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        NSDictionary *activeApp = [[NSWorkspace sharedWorkspace] activeApplication];
+        #pragma clang diagnostic pop
+
+        if (activeApp == nil) {
             return 0;
         }
-        pid_t frontPID = [frontApp processIdentifier];
+
+        NSNumber *pidNumber = activeApp[@"NSApplicationProcessIdentifier"];
+        if (pidNumber == nil) {
+            return 0;
+        }
+        pid_t frontPID = [pidNumber intValue];
 
         // 获取窗口列表
         CFArrayRef window_list = CGWindowListCopyWindowInfo(
