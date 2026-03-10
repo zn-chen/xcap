@@ -23,6 +23,34 @@
 #define PW_RENDERFULLCONTENT 2
 #endif
 
+// DPI Awareness initialization (called once on library load)
+static void init_dpi_awareness(void) {
+    // Try Windows 10 1703+ API first
+    typedef BOOL(WINAPI *SetProcessDpiAwarenessContextPtr)(DPI_AWARENESS_CONTEXT);
+    HMODULE user32 = GetModuleHandleW(L"user32.dll");
+    if (user32) {
+        SetProcessDpiAwarenessContextPtr set_dpi_ctx =
+            (SetProcessDpiAwarenessContextPtr)GetProcAddress(user32, "SetProcessDpiAwarenessContext");
+        if (set_dpi_ctx) {
+            set_dpi_ctx(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+            return;
+        }
+    }
+
+    // Fallback to Windows 8.1+ API
+    SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
+}
+
+// Auto-initialize on library load
+#ifdef _MSC_VER
+#pragma section(".CRT$XCU", read)
+__declspec(allocate(".CRT$XCU")) void (*_init_dpi_awareness)(void) = init_dpi_awareness;
+#else
+__attribute__((constructor)) static void _init_dpi_awareness_ctor(void) {
+    init_dpi_awareness();
+}
+#endif
+
 // ============================================================================
 // Monitor Functions
 // ============================================================================
